@@ -21,8 +21,9 @@ qui ressemble trait pour trait à l'original. Réponds-lui en français, sans ja
 
 ## Environnement
 - Python 3 avec pymupdf et fonttools (`pip install pymupdf fonttools`). Toujours lancer avec `-X utf8`.
-  Sous Windows, si `python` ouvre le Microsoft Store, utiliser le chemin complet de python.exe
-  (le noter ici une fois trouvé).
+  Sous Windows, si `python` ouvre le Microsoft Store, utiliser le chemin complet de python.exe.
+  Les chemins propres à la machine (python.exe, dossier de travail) se notent dans le `CLAUDE.md` du dossier
+  de travail, pas dans la skill : la skill est un dépôt git partagé, identique pour tout le monde.
 - Dossier de travail : celui où l'utilisateur dépose les PDF anglais ; les traductions y sont livrées
   (`<nom>_FR.pdf`). Les outils de chaque jeu traduit vont dans `_outils/<Jeu>/` (spec, build, polices `ff/`),
   avec un `_outils/LISEZMOI.md` à tenir à jour (polices et glossaire de chaque jeu).
