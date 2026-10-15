@@ -75,7 +75,12 @@ Préférences de traduction appliquées :
      pip install winrt-runtime winrt-Windows.Media.Ocr winrt-Windows.Globalization winrt-Windows.Graphics.Imaging winrt-Windows.Storage.Streams winrt-Windows.Foundation winrt-Windows.Foundation.Collections
      ```
      Chaque langue à lire doit être installée dans Windows (Paramètres → Heure et langue → Langue → ajouter la
-     langue avec la reconnaissance optique). Le japonais n'y est pas par défaut.
+     langue avec la reconnaissance optique). Le japonais n'y est pas par défaut ; le plus simple est d'installer
+     seulement son module de lecture, dans un terminal administrateur :
+     ```
+     dism /Online /Add-Capability /CapabilityName:Language.OCR~~~ja-JP~0.0.1.0
+     ```
+     (`Add-WindowsCapability` échoue sous PowerShell 7 avec « Classe non enregistrée »).
 3. **Installer les agents relecteurs** (facultatif mais conseillé) : copier les fichiers de `agents/` dans
    `~/.claude/agents/`, puis redémarrer Claude Code. La relecture est alors faite sur un modèle moins coûteux
    (voir [Coût en jetons et modèles](#coût-en-jetons-et-modèles)). Sans eux, la skill lance un agent ordinaire
@@ -169,7 +174,8 @@ au choix :
   et le français est posé dedans, la police étant réduite au besoin pour tenir.
 - **Côte à côte** : chaque page d'origine reste intacte, sa traduction complète est placée à droite.
 
-Le texte de l'image est lu automatiquement (`ocr.py`, moteur de Windows, 300 dpi) et regroupé en paragraphes
+Le texte de l'image est lu automatiquement (`ocr.py`, moteur de Windows, résolution adaptée à celle du scan ;
+japonais choisi seul quand le livret en contient) et regroupé en paragraphes
 avec leur position (`zones.py`), ce qui évite de recopier le texte à la main. Sans la langue installée dans
 Windows (souvent le cas du japonais), Claude lit les pages en images, ce qui coûte plus cher. Détails :
 `references/scan.md`.

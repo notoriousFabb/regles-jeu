@@ -1,5 +1,6 @@
 """Démarre la traduction d'un livret : un seul appel au lieu d'une dizaine d'étapes.
-Usage : python -X utf8 preparer.py "<chemin du livret.pdf>" "<Nom du jeu>" [--langue-ocr en-US]
+Usage : python -X utf8 preparer.py "<chemin du livret.pdf>" "<Nom du jeu>" [--langue-ocr de-DE]
+(scan sans --langue-ocr : lu en japonais si Windows le sait et que le texte en est, sinon en anglais)
 
 - nettoie le nom du jeu pour Windows (virgules, ! et caractères interdits retirés) ;
 - crée <Ludothèque>/_outils/<Jeu>/ (Ludothèque = dossier parent de « A traduire », sinon dossier du PDF) ;
@@ -43,6 +44,13 @@ def guess_lang(text):
     return best if score[best] else "inconnue"
 
 
+def mostly_japanese(zones):
+    """Lu en japonais, un livret anglais donne aussi quelques kana parasites : il faut qu'ils dominent."""
+    text = "".join(re.findall(r'^Z\(\d+, \([^)]*\), "(.*)"\)', zones, flags=re.M))
+    kana = len(re.findall(r"[぀-ヿ]", text))
+    return kana > 20 and kana > len(re.findall(r"[A-Za-z]", text))
+
+
 def run(args, cwd):
     r = subprocess.run([sys.executable, "-X", "utf8"] + args, cwd=cwd, capture_output=True, text=True,
                        encoding="utf8")
@@ -56,7 +64,7 @@ def main():
     if not os.path.isfile(pdf):
         sys.exit(f"ERREUR : livret introuvable : {pdf}")
     jeu = clean_name(sys.argv[2])
-    lang_ocr = sys.argv[sys.argv.index("--langue-ocr") + 1] if "--langue-ocr" in sys.argv else "en-US"
+    lang_ocr = sys.argv[sys.argv.index("--langue-ocr") + 1] if "--langue-ocr" in sys.argv else None
     folder = os.path.dirname(pdf)
     ludo = os.path.dirname(folder) if os.path.basename(folder).lower() in ("a traduire", "à traduire") else folder
     tools = os.path.join(ludo, "_outils", jeu)
@@ -88,7 +96,16 @@ def main():
     fonts_found = []
     if scan:
         print("\n--- lecture automatique (OCR) ---")
-        print(run(["ocr.py", pdf, lang_ocr, "zones.py"], tools))
+        zf = os.path.join(tools, "zones.py")
+        if lang_ocr:
+            print(run(["ocr.py", pdf, lang_ocr, "zones.py"], tools))
+        else:  # langue inconnue : japonais si Windows sait le lire et qu'il en sort du japonais, sinon anglais
+            out = run(["ocr.py", pdf, "ja", "zones.py"], tools) if "'ja" in run(["ocr.py", "--langues"], tools) else ""
+            if not (os.path.isfile(zf) and mostly_japanese(open(zf, encoding="utf8").read())):
+                out = run(["ocr.py", pdf, "en-US", "zones.py"], tools)
+            print(out)
+        if os.path.isfile(zf):
+            print(f"Langue devinée : {guess_lang(open(zf, encoding='utf8').read())}")
     else:
         print(f"Langue devinée : {guess_lang(text)}")
         print(run(["dump.py", pdf, "blocks.txt"], tools))

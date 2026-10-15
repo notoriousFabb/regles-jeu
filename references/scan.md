@@ -14,10 +14,13 @@
 ## Méthode « recouvrir »
 1. **Lecture automatique** : `preparer.py` lance `ocr.py` (reconnaissance de texte de Windows), qui écrit
    `zones.py` : un `Z(page, (x0, y0, x1, y1), "texte d'origine")` par paragraphe, la taille du texte et, en
-   commentaire, le haut et le bas de chaque ligne. Langue de lecture : `--langue-ocr en-US` (défaut), `fr-FR`,
-   `de-DE`… ; `python -X utf8 ocr.py --langues` liste celles installées. Japonais, chinois… : pack OCR de
-   Windows à installer par l'utilisateur (PowerShell en administrateur :
-   `Add-WindowsCapability -Online -Name "Language.OCR~~~ja-JP~0.0.1.0"`) ; sinon, méthode manuelle ci-dessous.
+   commentaire, le haut et le bas de chaque ligne. Langue de lecture : choisie seule (japonais si Windows sait
+   le lire et que le livret en contient, sinon anglais) ; autre langue : `--langue-ocr de-DE`, `fr-FR`… ;
+   `python -X utf8 ocr.py --langues` liste celles installées. Japonais, chinois… : module OCR de Windows à
+   installer par l'utilisateur (terminal administrateur :
+   `dism /Online /Add-Capability /CapabilityName:Language.OCR~~~ja-JP~0.0.1.0`) ; sinon, méthode manuelle
+   ci-dessous. L'OCR japonais confond souvent les petits caractères (ボ/ポ, ソ/リ, げ/け, kanji rares) :
+   corriger d'après le sens et vérifier les mots douteux sur la planche.
 2. **Écrire `spec.py`** à partir de `zones.py` : traduire chaque texte, **élargir `x1` jusqu'au bord de la
    colonne** (l'OCR donne la largeur du texte anglais, le français est plus long), couper une zone qui mélange
    titre et paragraphe (repères y en commentaire), régler `size` (≈ celle indiquée), `bold`, `align`, `color`.
