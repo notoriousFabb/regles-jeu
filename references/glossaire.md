@@ -1,6 +1,7 @@
 # Glossaire retenu (cohérence entre les jeux)
 
-Compléter ce tableau (et celui de `_outils/LISEZMOI.md` dans le dossier de travail) à chaque nouveau jeu.
+Termes généraux, réutilisables d'un jeu à l'autre. Le vocabulaire propre à un jeu va dans son
+`_outils/<Jeu>/NOTES.md` (voir SKILL.md), pas ici.
 
 | Anglais | Français |
 |---|---|
@@ -31,6 +32,26 @@ Compléter ce tableau (et celui de `_outils/LISEZMOI.md` dans le dossier de trav
 | Rumor / Character cards | cartes Rumeur / Personnage |
 | Potion / Suit tokens, Hierarchy Track | jetons Potion / Couleur, piste de Hiérarchie |
 | Barbarians / Druids / Mages / Paladins | Barbares / Druides / Mages / Paladins |
+| appeal / drunkenness points (This is from that customer…, JP アピール / 酩酊) | points de Charme / points d'Ivresse |
+| drink cards / water card / bartender (idem, お酒 / 水 / バーテン) | cartes Boisson / carte Eau / Barman |
+| restriction / binding (Shinobi Blade, JP 縛り) | contrainte (de couleur / de nombre) |
+| high risk / low risk betting zones (JP ハイリスク / ローリスク) | zone Risque élevé / Risque faible |
+| lead color | couleur demandée |
+| Team cards (Pack Tricks) | cartes Équipe |
+| Trump Suit Indicator | indicateur d'atout |
+| Starting Lead Player | premier entameur |
+
+## Équivalences dans d'autres langues
+Termes de base des jeux de plis ; renvoient au français du tableau ci-dessus. Compléter à chaque jeu.
+
+| Langue | pli | entamer | fournir | atout | manche | couleur | valeur |
+|---|---|---|---|---|---|---|---|
+| Allemand | Stich | ausspielen | bedienen (Farbzwang) | Trumpf | Runde | Farbe | Wert / Zahl |
+| Espagnol | baza | salir | asistir / seguir el palo | triunfo | ronda | palo | valor |
+| Italien | presa | aprire / giocare per primo | rispondere al seme | briscola | mano / round | seme | valore |
+| Portugais | vaza | sair / abrir | seguir o naipe | trunfo | rodada | naipe | valor |
+| Néerlandais | slag | uitkomen | bekennen | troef | ronde | kleur | waarde |
+| Japonais | トリック | リード | マストフォロー | 切り札 | ラウンド | スート | 数字 |
 
 Conventions :
 - Types de cartes, jetons, pistes : nom générique + nom propre avec majuscule (« carte Rumeur », « jeton Potion »).
