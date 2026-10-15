@@ -1,5 +1,5 @@
 """Images de relecture : original à gauche, traduction à droite (sideN.png).
-Usage : python -X utf8 side.py livret_EN.pdf sortie_FR.pdf 0,1,2 [dpi=110]"""
+Usage : python -X utf8 side.py livret_original.pdf sortie_FR.pdf 0,1,2 [dpi=110]"""
 import pymupdf, sys
 
 a, b = pymupdf.open(sys.argv[1]), pymupdf.open(sys.argv[2])

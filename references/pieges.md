@@ -21,11 +21,28 @@ La plupart sont déjà gérés par `scripts/build.py` ; ce qui reste à faire da
   l'interligne) et le signaler.
 - **Mini-cartes illustrées** (texte de 1 à 4 pt) : table `CARDS` + `CARD_PAGES` ; ne traduire que les cartes
   dont le texte est visible (cartes empilées : seulement celle de devant), sinon le français s'affiche
-  par-dessus. Les couleurs qui distinguent numéro / ambiance / effet sont codées dans `card_flows` : à adapter.
+  par-dessus. Les styles qui distinguent numéro / ambiance / effet se
+  règlent dans `CARD_STYLE` (voir `spec_modele.py`).
+- **Mots soulignés** (traits dessinés sous la ligne, pas du texte) : le build retire ceux qui sont sous une
+  ligne remplacée (journal : « soulignement(s) d'origine retiré(s) ») ; souligner le français avec
+  `<u>…</u>` et `u {text-decoration:underline;}` dans le CSS du spec.
+- **Polices du livret complètes** : si `polices.py glyphes` ne signale aucun manque (police embarquée en
+  entier), copier simplement l'originale dans `ff/`.
+- **Plusieurs colonnes par page** : détectées seules (blancs verticaux à la hauteur du paragraphe, texte de la
+  colonne voisine jusqu'à 150 pt plus haut ou plus bas) ; si un paragraphe déborde quand même (signalé « À
+  VÉRIFIER »), lui donner `x1=` ou `COLUMNS`.
+- **Étapes numérotées sur pastilles** : le moteur ancre seul un paragraphe dont le premier caractère est posé
+  sur une petite forme pleine (`fix=True` implicite, `fix=False` pour l'empêcher) et réduit le texte qui
+  précéderait trop bas. Le chiffre, s'il est du texte (blanc), reste à réécrire au début du français avec un
+  retrait suspendu (`<div style="margin-left:8pt;text-indent:-8pt">`).
+- **Bouts d'illustration pris pour des icônes** (journal : « {} pour N icône(s) » sur un paragraphe sans
+  icône) : `noicons=True` sur le paragraphe.
+- **Insécables** : « Bleu 19 », « joueur A », « page 3 », « étape 2 » sont protégés par le moteur (mot à
+  majuscule + nombre, et joueur / page / étape / manche / carte… + nombre ou lettre). Autre cas : `&#160;`.
 - **Glyphe spécial pour un chiffre** (« Ä » ou � qui s'affiche « 0 ») : écrire simplement « 0 ».
 - **Coupures indésirables** : le build met une insécable avant `{}` et après un nombre suivi d'un mot ; pour
   « p. 8 » ou « 1 - 2 = -1 » écrire `&#160;` dans le spec.
-- **Titres longs** (nom anglais + français) : `T(...)` les garde sur une ligne ; s'ils touchent une image,
+- **Titres longs** (nom d'origine + français) : `T(...)` les garde sur une ligne ; s'ils touchent une image,
   raccourcir le français ou passer `size=`.
 - **Modifier spec/build par script** : écrire le script Python dans le scratchpad avec l'outil Write ; les `\1`,
   `\'` et apostrophes dans un heredoc bash se corrompent facilement.
