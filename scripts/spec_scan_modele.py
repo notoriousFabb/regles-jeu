@@ -6,7 +6,8 @@ MODE "recouvrir" : ZONES = rectangles de texte de l'image ; chacun est masqué p
     Coordonnées en points PDF, origine en haut à gauche, lues sur les images de grille.py.
     Z(page, (x0, y0, x1, y1), html, **o) — options : size (taille de départ, défaut 7), kmin (réduction maximale,
         défaut 0.5), align ("left", "center", "right", "justify"), color ("#rrggbb", défaut noir), fam / bold / ital,
-        lead (interligne en multiple de la taille, défaut 1.15), pad (marge intérieure, défaut 0.5),
+        lead (interligne en multiple de la taille, défaut 1.15), pad (marge intérieure, défaut 0.5 ; zone d'une
+        seule ligne : lead 1.0 et pad -0.6 d'office),
         bg ("auto" = couleur du fond autour de la zone, "#rrggbb", None = ne pas masquer),
         en ("texte d'origine", repris de zones.py : sert à relecture.py)
     M(page, (x0, y0, x1, y1), bg="auto") — masque seul (effacer un texte sans le remplacer)
@@ -22,6 +23,7 @@ CSS = """
 @font-face{font-family:Av;src:url(AlegreyaSans-Regular.ttf);}
 @font-face{font-family:Av;font-weight:bold;src:url(AlegreyaSans-Bold.ttf);}
 @font-face{font-family:Av;font-style:italic;src:url(AlegreyaSans-Italic.ttf);}
+@font-face{font-family:Sym;src:url(seguisym.ttf);}
 """
 BODY = "Av"
 
@@ -34,6 +36,28 @@ def Z(page, rect, html, **o):
 
 def M(page, rect, bg="auto"):
     ZONES.append(dict(page=page, rect=rect, html=None, bg=bg))
+
+
+# ---------------------------------------------------------------- aides (supprimer celles qui ne servent pas)
+def S(c, color=None):
+    """①…⑳, ❶…❿, ◆, ★ : Segoe UI Symbol (copier C:/Windows/Fonts/seguisym.ttf dans ff/)."""
+    return f'<span style="font-family:Sym;{f"color:{color};" if color else ""}">{c}</span>'
+
+
+def I(name, h=7):
+    """Icône dans le texte : ff/<name>.png, découpée dans l'original avec icone.py."""
+    return f'<img src="{name}.png" style="height:{h}pt"/>'
+
+
+def BANNER(page, rect, text, fam=BODY, size=9, bg="#000000", color="#ffffff", indent=6):
+    """Bandeau de titre (texte clair sur aplat) ; le rectangle peut dépasser l'original pour l'élargir."""
+    M(page, rect, bg=bg)
+    Z(page, (rect[0] + indent,) + tuple(rect[1:]), text, fam=fam, size=size, color=color, bg=None)
+
+
+def PILL(page, rect, text, bg, size=7.5, color="#ffffff"):
+    """Titre sur pastille arrondie : garder le rectangle à l'intérieur des bouts arrondis."""
+    Z(page, rect, f"<b>{text}</b>", size=size, color=color, bg=bg, align="center")
 
 
 PAGES = {}

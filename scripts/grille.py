@@ -14,7 +14,7 @@ dpi = int(args[0]) if args else 200
 step = float(args[1]) if len(args) > 1 else 10.0
 
 src = doc[pno]
-area = clip or src.rect
+area = (clip or src.rect) & src.rect  # sinon une zone hors page décale la grille
 out = pymupdf.open()
 pg = out.new_page(width=area.width, height=area.height)
 pg.show_pdf_page(pg.rect, doc, pno, clip=area)

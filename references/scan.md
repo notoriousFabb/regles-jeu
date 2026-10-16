@@ -34,7 +34,10 @@
    floue pour lire sans deviner, le dire plutôt que d'inventer.
 4. **Construire** : `python -X utf8 scan.py sortie.pdf`. Réglages utiles :
    - livret dense : `pad=-0.5` (le texte peut dépasser un peu du masque) et `lead=1.0` ;
-   - zone d'une seule ligne : interligne 1.0 et `pad` plus négatif, sinon la police est réduite pour rien ;
+   - zone d'une seule ligne : `lead=1.0` et `pad=-0.6` posés d'office ;
+   - symboles ①❶◆★ : `S("①")` (Segoe UI Symbol, copiée dans `ff/` par `preparer.py`) ; icône dans le texte :
+     `icone.py livret.pdf <page> x0,y0,x1,y1 nom` puis `I("nom")` ; titre sur aplat : `BANNER(...)` (rectangle
+     plus large que l'original pour un titre français plus long), `PILL(...)` (pastille arrondie) ;
    - agrandir chaque masque d'environ 1,5 pt vers le bas (jambages du texte d'origine) ; commencer les listes
      numérotées assez à gauche pour couvrir les numéros d'origine ;
    - fond sombre ou coloré mal deviné (bulle, encadré) : `bg="#rrggbb"` mesuré sur l'original ; `M(...)` pour
