@@ -1,68 +1,78 @@
 ---
 name: traduction-regles-jeu
-description: Traduit en français un livret de règles de jeu de société en PDF (anglais → français) en conservant exactement la mise en page — polices, images, icônes dans le texte, tableaux, positions — et produit un `*_FR.pdf`. À utiliser dès que l'utilisateur demande de traduire des règles, un livret, un rulebook ou un PDF de jeu (jeu de plis, jeu de cartes, jeu de société), même s'il ne dit que « traduis-moi ce PDF » ou donne juste un nom de fichier comme `xxx_rulebook.pdf` ou `Regles_EN.pdf` ; aussi pour corriger un mot ou une phrase dans une traduction déjà faite de cette façon.
+description: Traduit en français un livret de règles de jeu de société en PDF depuis n'importe quelle langue (anglais, allemand, espagnol, italien, japonais…) en conservant exactement la mise en page — polices, images, icônes dans le texte, tableaux, positions — et produit un `*_FR.pdf` ; gère aussi les livrets scannés (pages-images sans texte). À utiliser dès que l'utilisateur demande de traduire des règles, un livret, un rulebook ou un PDF de jeu (jeu de plis, jeu de cartes, jeu de société), même s'il ne dit que « traduis-moi ce PDF » ou donne juste un nom de fichier comme `xxx_rulebook.pdf`, `Regles_EN.pdf`, `Spielregel.pdf` ou `Reglas.pdf` ; aussi pour corriger un mot ou une phrase dans une traduction déjà faite de cette façon.
 ---
 
-# Traduction de livrets de règles (EN → FR, mise en page conservée)
+# Traduction de livrets de règles (toutes langues → FR, mise en page conservée)
 
 L'utilisateur parle français, joue à des jeux de plis et ne touche pas aux scripts : il veut un PDF français
 qui ressemble trait pour trait à l'original. Réponds-lui en français, sans jargon technique inutile.
 
-## Préférences de l'utilisateur (importantes)
-- Ne jamais traduire le titre du jeu ni les noms de variantes (Numberwang+, Tricklings…).
-- Noms de cartes / personnages : anglais, avec le français entre parenthèses dans les titres
-  (« The Bride (La Fiancée) ») ; nom anglais aussi dans le texte (« 0-Bride »).
-- Vocabulaire cohérent entre jeux : pli, entamer, fournir, atout, manche, couleur, valeur, main, distribuer,
-  paquet, décompte… → `references/glossaire.md` (le compléter à chaque jeu).
-- Typographie française : « », espaces insécables avant ; : ! ? (le build les pose), décimales à virgule.
-- Les polices embarquées n'ont généralement pas d'accents → polices libres proches (`references/polices.md`).
-- Relire chaque page côte à côte (original / traduction) avant de livrer, et signaler les compromis : taille de
-  police réduite, phrases condensées, textes dans les images non traduits, doublons de l'original.
+## Préférences de l'utilisateur
+- Ne jamais traduire le titre du jeu ni les noms de variantes.
+- Noms de cartes / personnages : dans la langue d'origine, français entre parenthèses dans les titres
+  (« The Bride (La Fiancée) ») ; nom d'origine aussi dans le texte. Alphabet non latin : nom imprimé en
+  lettres latines s'il existe, sinon nom anglais officiel, sinon romanisation.
+- Vocabulaire cohérent entre jeux (pli, entamer, fournir, atout, couleur demandée…) : `references/glossaire.md`.
+- Typographie française : « », espaces insécables avant ; : ! ? (posées par le moteur), décimales à virgule.
+- Signaler les compromis : police réduite, phrases condensées, texte des illustrations non traduit.
 
 ## Environnement
-- Python 3 avec pymupdf et fonttools (`pip install pymupdf fonttools`). Toujours lancer avec `-X utf8`.
-  Sous Windows, si `python` ouvre le Microsoft Store, utiliser le chemin complet de python.exe.
-  Les chemins propres à la machine (python.exe, dossier de travail) se notent dans le `CLAUDE.md` du dossier
-  de travail, pas dans la skill : la skill est un dépôt git partagé, identique pour tout le monde.
-- Dossier de travail : celui où l'utilisateur dépose les PDF anglais ; les traductions y sont livrées
-  (`<nom>_FR.pdf`). Les outils de chaque jeu traduit vont dans `_outils/<Jeu>/` (spec, build, polices `ff/`),
-  avec un `_outils/LISEZMOI.md` à tenir à jour (polices et glossaire de chaque jeu).
-- Scripts de la skill (`scripts/` à côté de ce fichier) : `build.py` (moteur générique), `spec_modele.py`,
-  `dump.py`, `side.py`, `sheet.py`.
+Python 3 avec pymupdf et fonttools (`-X utf8` toujours) ; winrt pour la lecture des scans (voir `ocr.py`).
+Organisation de la ludothèque, noms de dossiers et index : `references/dossiers.md` (à lire au premier jeu
+d'une session). En bref : dépôt `A traduire/`, outils `_outils/<Jeu>/`, livrets livrés dans `<Jeu>/`, index
+`_outils/LISEZMOI.md` (une ligne par jeu, à chercher avec `grep`), détail d'un jeu dans `_outils/<Jeu>/NOTES.md`.
+Scripts : `scripts/` à côté de ce fichier ; `preparer.py` copie ceux qu'il faut dans le dossier d'outils.
 
 ## Méthode
-1. **Repérer le livret** : nombre de pages, polices (`page.get_fonts()`), texte brut ; `sheet.py` pour une
-   planche d'aperçu, puis la regarder. Noter : icônes dans le texte, cartes illustrées contenant du texte,
-   listes à puces, texte qui contourne des images, calques cachés.
-2. **Créer `_outils/<Jeu>/`** et y copier `build.py`, `spec_modele.py` → `spec.py`, `side.py`, `dump.py`.
-   Si un jeu déjà traduit est très proche, partir plutôt de son dossier (même éditeur, mêmes polices).
-3. **Polices** : extraire les originales dans `fonts/`, vérifier leurs glyphes, choisir les remplaçantes dans
-   `ff/` (planche comparative), régler en tête de `build.py` : `SRC`, `CSS` (@font-face), `CODE`
-   (police d'origine → famille, gras, italique), `SIZE_K`, colonnes `XL/XR`.
-4. **`dump.py livret.pdf`** → `blocks.txt` : chaque ligne avec police, taille, couleur, position. C'est la carte
-   pour écrire le spec. Le lire en entier (les blocs PDF ne correspondent pas toujours aux paragraphes).
-5. **Écrire `spec.py`** : un flux (`F`) par zone de texte, des paragraphes `P` / `C` (centré) / `L` (puce) /
-   `T` (titre de carte), `{}` à l'emplacement de chaque icône, `maxy` = limite basse (image ou encadré
-   suivant). Format détaillé dans l'en-tête de `spec_modele.py`. Traduire de façon concise : le français est
-   ~15 % plus long et la place est comptée.
-6. **Construire** : `python -X utf8 build.py sortie.pdf`. Lire le journal : « font scale » (police réduite),
-   « OVERFLOW », « placeholders for N icons », « not re-placed » — chaque ligne mérite une correction ou un
-   compromis assumé.
-7. **Relire** : `side.py livret_EN.pdf sortie.pdf all` puis regarder chaque `sideN.png` ; zoomer
-   (`get_pixmap(clip=…, dpi=300)`) sur les zones délicates. Corriger le spec (raccourcir, couper autrement,
-   `fix=True`, `x1`…), reconstruire, relire. Vérifier qu'aucun marqueur « ¤ » ne reste dans le texte.
-8. **Livrer** : copier vers `<nom>_FR.pdf` dans le dossier de travail, supprimer les images et fichiers
-   temporaires, compléter `_outils/LISEZMOI.md` (polices, glossaire) et `references/glossaire.md`.
-   Résumer à l'utilisateur : fichier, choix de vocabulaire, compromis.
-
-`references/pieges.md` liste les difficultés déjà rencontrées (texte en double, pastilles numérotées,
-texte autour des cartes, mini-cartes, calques cachés…) et leur solution : le lire avant d'écrire le spec.
+1. **Préparer** : `python -X utf8 <skill>/scripts/preparer.py "<livret.pdf>" "<Nom du jeu>"`. Il nettoie le
+   nom, crée `_outils/<Jeu>/`, détecte texte ou scan, copie scripts et modèle de spec (SRC rempli), fait la
+   planche d'aperçu, l'inventaire `blocks.txt`, extrait les polices et signale les accents manquants, devine
+   la langue (`references/langues.md`), lit le texte des scans (OCR → `zones.py`) et liste les jeux déjà
+   traduits qui ont les mêmes polices. Regarder la planche, annoncer langue, pages, type.
+   **Scan** : demander le rendu puis suivre `references/scan.md`. Le reste ci-dessous concerne les livrets à texte.
+2. **Polices** (`references/polices.md`) : réutiliser celles d'un jeu proche, sinon choisir des remplaçantes
+   (`polices.py glyphes / planche / largeur`), les mettre dans `ff/` et régler en tête de `spec.py` : `CSS`,
+   `BODY`, `CODE` (police d'origine → famille, gras, italique), `SIZE_K`, et si besoin `COLUMNS`.
+3. **Écrire `spec.py`** d'après `blocks.txt` (le lire en entier ; « [N icône(s)] » = autant de `{}`) : un flux
+   `F` par zone de texte, paragraphes `P` / `C` / `L` / `T`, `maxy` = limite basse ; format dans l'en-tête de
+   `spec.py`. Le moteur trouve seul la colonne de chaque paragraphe (plusieurs colonnes par page), ancre les
+   étapes numérotées posées sur une pastille et évite les coupures « Bleu | 19 », « joueur | A » ; `x1=`,
+   `fix=` ou `COLUMNS` ne servent qu'à corriger un cas raté. Lire `references/pieges.md` avant.
+   Modifier le spec avec l'outil d'édition (pas `sed` ni un script dans le terminal : les `\` et les
+   apostrophes s'y abîment).
+4. **Construire** : `python -X utf8 build.py sortie.pdf`. « ERREUR : » = spec à corriger. Journal : « police
+   réduite », « DÉBORDE », « N {} … pour M icône(s) », « icône … non replacée », **« TEXTE NON TRADUIT »**
+   (traduire, ou `IGNORE` si voulu), **« À VÉRIFIER »** (contrôles automatiques : français qui chevauche une
+   image, un autre texte ou du texte d'origine, ou qui sort de la page).
+5. **Relire** — confiée à deux agents sur un modèle moins coûteux, lancés **en parallèle** (un seul message,
+   deux appels Agent), pour garder la traduction et les décisions sur le modèle principal et les longues
+   lectures et images hors de son contexte :
+   - `subagent_type: "relecteur-texte"` — message : dossier d'outils et dossier de la skill. Il lance
+     `relecture.py`, lit tout `texte_fr.txt` (original et français) et rend sens, oublis, vocabulaire, langue ;
+   - `subagent_type: "relecteur-visuel"` — message : dossier d'outils, PDF d'origine, PDF construit, journal,
+     endroits à regarder en priorité. Il fait les vues côte à côte (`side.py`), zoome sur les endroits signalés
+     et rend les défauts localisés.
+   Agents non installés (`agents/` de la skill absent de `~/.claude/agents/`) : `subagent_type:
+   "general-purpose"`, `model: "sonnet"`, avec pour message le contenu du fichier `agents/relecteur-….md`
+   (sans l'en-tête) suivi des chemins.
+   Les rapports sont des propositions : vérifier chaque point (lire le paragraphe, zoomer sur l'endroit)
+   avant de corriger ; ne rien corriger « de mémoire ». Corriger, reconstruire, et pour une petite correction
+   regarder soi-même la seule page modifiée plutôt que de relancer les agents.
+6. **Livrer** : écrire `_outils/<Jeu>/NOTES.md` (langue d'origine, éditeur, type, polices, vocabulaire propre
+   au jeu, choix, compromis, astuces du spec), puis
+   `python -X utf8 livrer.py "<Ludothèque>/_outils/<Jeu>"` (`--remplacer` seulement si l'utilisateur l'a
+   accepté). Il déplace l'original dans `<Jeu>/`, met `SRC` à jour, allège le dossier d'outils (`ranger.py` :
+   polices réduites au français et sans ligatures), reconstruit, copie `<nom>_FR.pdf`, met l'index à jour.
+   Reporter dans `references/glossaire.md` les seuls termes généraux nouveaux. Résumer à l'utilisateur :
+   fichier, choix de vocabulaire, compromis.
 
 ## Économiser les jetons
-Une traduction coûte ~170-200 k jetons, surtout à cause des images de relecture. Regarder les pages en
-planches ou côte à côte à 100-110 dpi, ne zoomer que sur les problèmes, ne relire après correction que les
-pages modifiées. Préférer modifier le spec par petits remplacements ciblés plutôt que tout réécrire.
+Les images coûtent cher : planches à 80-110 dpi, zooms seulement sur ce qui est signalé ou douteux, pas de
+relecture complète après une petite correction. Lire `blocks.txt` ou `zones.py` plutôt que des images pour le
+texte. Index : `grep`, pas de lecture intégrale. Ne déléguer à un agent que la relecture (étape 5) : pour les
+scripts courts, le coût de démarrage d'un agent dépasse le gain ; la traduction et le spec restent ici.
 
 ## Correction d'une traduction existante
-Ouvrir `_outils/<Jeu>/spec*.py`, changer le texte, relancer le `build.py` du dossier, relire la page,
-recopier vers `<nom>_FR.pdf`.
+Lire `_outils/<Jeu>/NOTES.md`, modifier `spec.py`, relancer `build.py` (ou `scan.py`) dans ce dossier, regarder
+la page, puis `livrer.py … --remplacer` (avec l'accord de l'utilisateur pour remplacer le `_FR.pdf`).
