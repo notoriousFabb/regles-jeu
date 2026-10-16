@@ -42,6 +42,8 @@ de l'espace : au-delà de ~0,3 em le texte paraît justifié
 | HarenosoraMincho (japonais, sans latin) | Zen Old Mincho | |
 | Rodin NTLG / Rodin Happy (japonais arrondi) | M PLUS Rounded 1c (Medium / Bold / ExtraBold / Black) | Google Fonts |
 | VDL MegaMaru (japonais manuscrit arrondi) | Itim | |
+| TsukuARdGothic Regular / Bold, KozGoPr6N (japonais arrondi) | Zen Maru Gothic Regular / Bold | facteur 1,0 |
+| Grow-Year (titres manuscrits, numéros) | Chewy | facteur 1,1 |
 | Source Han Sans JP Bold, Arimo | Arial Bold, Arial | Windows |
 | Lato, MedievalSharp (embarquées complètes) | les mêmes, copiées depuis le PDF | |
 | texte d'un scan, sans serif type Work Sans | Work Sans (graisses fixes extraites de la police variable) | fontTools instancer |

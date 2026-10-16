@@ -14,8 +14,8 @@ HEADER = """# Index des livrets traduits (skill traduction-regles-jeu)
 
 Une ligne par jeu. Le détail de chaque jeu (polices, vocabulaire, choix, particularités) est dans
 `_outils/<Jeu>/NOTES.md` ; les livrets (original et `_FR.pdf`) sont dans `<Jeu>/`.
-Pour reconstruire : `python -X utf8 build.py sortie.pdf` (Type « texte ») ou `scan.py` (Type « scan ») dans
-`_outils/<Jeu>/`, puis copier vers `<Jeu>/<nom>_FR.pdf` et lancer `ranger.py`.
+Pour corriger : modifier `spec.py` dans `_outils/<Jeu>/`, vérifier avec `python -X utf8 build.py sortie.pdf`
+(Type « texte ») ou `scan.py` (Type « scan »), puis `python -X utf8 livrer.py "_outils/<Jeu>" --remplacer`.
 Chercher un jeu proche par éditeur ou par police : `grep -i "<éditeur ou police>" _outils/LISEZMOI.md`.
 
 | Jeu | Langue | Éditeur | Type | Polices de remplacement | Date |
