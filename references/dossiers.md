@@ -16,6 +16,8 @@ s'y notent aussi, pas dans la skill (dépôt git partagé).
 - **notes du jeu** : `_outils/<Jeu>/NOTES.md` (livrets, langue d'origine, éditeur, type, polices et leur origine,
   vocabulaire propre au jeu, choix et compromis, astuces du spec). Écrites à la main avant `livrer.py`, qui lit
   « Langue d'origine : » et « Éditeur : » pour l'index. Ne lire que celles des jeux proches.
+- Livret déjà rangé dans `<Ludothèque>/<Jeu>/` (retraduction) : outils dans `<Ludothèque>/_outils/<Jeu>/`,
+  reconnu par le dossier `_outils` voisin ; rien n'est déplacé.
 - Sans dossier de dépôt (PDF posé ailleurs) : outils dans `_outils/<Jeu>/` à côté du PDF, rien n'est déplacé.
 
 ## Nom `<Jeu>`

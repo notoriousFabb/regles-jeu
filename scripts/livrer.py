@@ -21,7 +21,7 @@ Chercher un jeu proche par éditeur ou par police : `grep -i "<éditeur ou polic
 | Jeu | Langue | Éditeur | Type | Polices de remplacement | Date |
 |---|---|---|---|---|---|
 """
-LANG_SUFFIX = re.compile(r"[ _\-.]?(EN|ENG|JP|JA|JPN|DE|GER|ES|SP|IT|CN|ZH|KR|KO|PT|NL|PL|RU)$", re.I)
+LANG_SUFFIX = re.compile(r"[ _\-.](EN|ENG|JP|JA|JPN|DE|GER|ES|SP|IT|CN|ZH|KR|KO|PT|NL|PL|RU)$", re.I)
 
 
 def fail(msg):
