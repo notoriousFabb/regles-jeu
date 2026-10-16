@@ -177,8 +177,16 @@ au choix :
 Le texte de l'image est lu automatiquement (`ocr.py`, moteur de Windows, résolution adaptée à celle du scan ;
 japonais choisi seul quand le livret en contient) et regroupé en paragraphes
 avec leur position (`zones.py`), ce qui évite de recopier le texte à la main. Sans la langue installée dans
-Windows (souvent le cas du japonais), Claude lit les pages en images, ce qui coûte plus cher. Détails :
-`references/scan.md`.
+Windows (souvent le cas du japonais), Claude lit les pages en images, ce qui coûte plus cher.
+
+Pour le rendu « recouvrir », la skill sait aussi :
+- poser les symboles ①❶◆★ avec une police de Windows (Segoe UI Symbol, copiée d'office) quand celle du texte
+  ne les a pas ;
+- découper une icône de l'original (`icone.py`) pour la remettre dans la phrase française ;
+- refaire les titres sur bandeau ou sur pastille, en élargissant le bandeau si le français est plus long ;
+- garder à leur taille les zones d'une seule ligne (interligne et marge resserrés d'office).
+
+Détails : `references/scan.md`.
 
 ---
 
