@@ -46,6 +46,8 @@ de l'espace : au-delà de ~0,3 em le texte paraît justifié
 | Lato, MedievalSharp (embarquées complètes) | les mêmes, copiées depuis le PDF | |
 | texte d'un scan, sans serif type Work Sans | Work Sans (graisses fixes extraites de la police variable) | fontTools instancer |
 | texte japonais dense d'un scan | Arial Narrow + Segoe UI Symbol pour ①…⑦, ※ | Windows |
+| TsukuARdGothic Regular / Bold, KozGoPr6N (japonais arrondi) | Zen Maru Gothic Regular / Bold | facteur 1,0 |
+| Grow-Year (titres manuscrits, numéros) | Chewy | facteur 1,1 |
 
 Ces polices sont déjà dans le dossier `ff/` des jeux traduits (voir la colonne Polices de l'index `LISEZMOI.md`) : les
 copier plutôt que retélécharger.
