@@ -249,6 +249,7 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
   - `dump.py` : inventaire du texte (`blocks.txt`) ; `polices.py` : extraction, contrôle des accents,
     comparaison et largeur des polices ; `ocr.py` : lecture du texte des scans ;
   - `grille.py` / `bandes.py` : mesures de position sur les scans ;
+  - `icone.py` : découpe une icône d'un scan pour la remettre dans le texte français ;
   - `sheet.py` / `side.py` : planche d'aperçu et images côte à côte original / français ;
   - `relecture.py` : relecture du texte seul ;
   - `livrer.py` : livraison ; `ranger.py` : allègement du dossier d'outils.
