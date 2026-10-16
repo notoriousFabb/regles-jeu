@@ -191,7 +191,7 @@ au choix :
 
 Le texte de l'image est lu automatiquement (`ocr.py`, moteur de Windows, résolution adaptée à celle du scan ;
 japonais choisi seul quand le livret en contient) et regroupé en paragraphes
-avec leur position dans un fichier `zones.py`, ce qui évite de recopier le texte à la main. Sans la langue installée dans
+avec leur position (`zones.py`), ce qui évite de recopier le texte à la main. Sans la langue installée dans
 Windows (souvent le cas du japonais), Claude lit les pages en images, ce qui coûte plus cher. Détails :
 `references/scan.md`.
 
@@ -253,8 +253,7 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
   - `dossiers.md` : organisation des dossiers, noms de jeux, index et notes ;
   - `langues.md` : langue de départ, livrets multilingues, longueur du français selon la langue, texte vertical ;
   - `scan.md` : livrets scannés (lecture automatique, zones, rendus) ;
-  - `glossaire.md` : vocabulaire de jeu commun à tous les jeux (pli, meneur, atout…), avec équivalences par
-    langue ;
+  - `glossaire.md` : vocabulaire de jeu commun à tous les jeux, avec équivalences par langue ;
   - `polices.md` : polices de remplacement déjà trouvées pour des polices de livrets ;
   - `pieges.md` : cas difficiles rencontrés et leurs solutions (texte en double, calques cachés, icônes,
     mini-cartes, soulignements, marges de paragraphe…).
