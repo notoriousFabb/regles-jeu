@@ -44,5 +44,11 @@ La plupart sont déjà gérés par `scripts/build.py` ; ce qui reste à faire da
   « p. 8 » ou « 1 - 2 = -1 » écrire `&#160;` dans le spec.
 - **Titres longs** (nom d'origine + français) : `T(...)` les garde sur une ligne ; s'ils touchent une image,
   raccourcir le français ou passer `size=`.
+- **Marges de paragraphe ignorées** (livret composé avec `pymupdf.Story`) : MuPDF donne à `<p>` une marge
+  par défaut de 1em en haut et en bas, que `* {margin:0}` ne remet pas à zéro. Une règle qui ne fixe qu'un
+  côté (`p {margin-bottom:6pt}`) laisse l'autre à 1em, qui l'emporte (marges fusionnées) : l'écart reste
+  d'une ligne entière, sans message. Toujours donner les quatre côtés dans la règle du paragraphe ou de sa
+  classe : `p {margin: 0 0 6pt 0;}`, `.memo {margin: 0 0 3pt 0;}`. Symptôme : listes ou paragraphes
+  anormalement espacés, page qui déborde alors qu'elle devrait tenir. `margin-left` seul fonctionne.
 - **Modifier spec/build par script** : écrire le script Python dans le scratchpad avec l'outil Write ; les `\1`,
   `\'` et apostrophes dans un heredoc bash se corrompent facilement.
