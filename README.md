@@ -101,6 +101,11 @@ ou simplement « traduis la règle » s'il n'y a qu'un PDF. Claude annonce la la
 de livret (à texte ou scanné), pose une question seulement si c'est nécessaire (par exemple le rendu d'un livret
 scanné), traduit, vérifie, puis range. À la fin, il résume : fichier produit, choix de vocabulaire, compromis.
 
+**Livret seulement consultable en ligne** (lien Google Drive sans téléchargement) : donner le lien à Claude. Il
+cherche d'abord un PDF téléchargeable (site de l'éditeur, BoardGameGeek), sinon, avec votre accord, récupère
+les pages en images par le navigateur et les assemble en PDF, traité ensuite comme un livret scanné
+(`references/en-ligne.md`).
+
 Pour corriger une traduction existante : « dans Merge Take, remplace "la plus forte" par "de plus haute
 valeur" » (voir [plus bas](#corriger-une-traduction-déjà-faite)).
 
@@ -237,6 +242,7 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
   - `dossiers.md` : organisation des dossiers, noms de jeux, index et notes ;
   - `langues.md` : langue de départ, livrets multilingues, longueur du français selon la langue, texte vertical ;
   - `scan.md` : livrets scannés (lecture automatique, zones, rendus) ;
+  - `en-ligne.md` : récupérer un livret seulement consultable en ligne (Google Drive) ;
   - `glossaire.md` : vocabulaire de jeu commun à tous les jeux, avec équivalences par langue ;
   - `polices.md` : polices de remplacement déjà trouvées pour des polices de livrets ;
   - `pieges.md` : cas difficiles rencontrés et leurs solutions (texte en double, calques cachés, icônes,
