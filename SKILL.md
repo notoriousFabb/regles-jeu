@@ -24,6 +24,18 @@ d'une session). En bref : dépôt `A traduire/`, outils `_outils/<Jeu>/`, livret
 `_outils/LISEZMOI.md` (une ligne par jeu, à chercher avec `grep`), détail d'un jeu dans `_outils/<Jeu>/NOTES.md`.
 Scripts : `scripts/` à côté de ce fichier ; `preparer.py` copie ceux qu'il faut dans le dossier d'outils.
 
+## Quel livret traduire
+- Chemin donné (dossier ou PDF) : l'utiliser. Sinon, le dossier de dépôt `A traduire/` (son emplacement est
+  noté dans le `CLAUDE.md` de l'utilisateur).
+- **Plusieurs PDF** : les lister, en regroupant ceux d'un même jeu (règles + extension, livret + aide de jeu :
+  même dossier de jeu), avec le coût estimé (~150-200 k jetons par livret), puis demander : tout traduire un
+  par un, ou un livret précis ? Ne rien commencer avant la réponse.
+  - **Tout** : un livret à la fois, dans l'ordre de la liste, sans parallélisme (les livraisons écrivent dans
+    le même index) ; court bilan après chacun (fichier produit, compromis) puis enchaîner sans attendre. Un
+    livret qui pose un vrai problème (police introuvable, scan illisible…) est mis de côté, signalé, et on
+    continue avec les autres.
+  - **Un livret précis** : ne traduire que celui-là ; les autres restent dans le dossier de dépôt.
+
 ## Méthode
 1. **Préparer** : `python -X utf8 <skill>/scripts/preparer.py "<livret.pdf>" "<Nom du jeu>"`. Il nettoie le
    nom, crée `_outils/<Jeu>/`, détecte texte ou scan, copie scripts et modèle de spec (SRC rempli), fait la
