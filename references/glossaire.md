@@ -7,7 +7,8 @@ Termes généraux, réutilisables d'un jeu à l'autre. Le vocabulaire propre à 
 |---|---|
 | trick / lead / follow suit / trump | pli / entamer / fournir / atout |
 | trump broken | atout « ouvert » |
-| the lead (joueur) / starting player | l'entameur / premier joueur |
+| the lead (joueur) / lead player / starting player | le meneur (choix de l'utilisateur, pas « entameur ») / premier joueur |
+| lead card | carte d'entame |
 | round / game | manche / partie |
 | hand / deal / deck | main / distribuer / paquet |
 | draw pile / draw display / discard | pioche / rivière / défausse |
@@ -39,7 +40,7 @@ Termes généraux, réutilisables d'un jeu à l'autre. Le vocabulaire propre à 
 | lead color | couleur demandée |
 | Team cards (Pack Tricks) | cartes Équipe |
 | Trump Suit Indicator | indicateur d'atout |
-| Starting Lead Player | premier entameur |
+| Starting / Initial Lead Player | premier meneur |
 
 ## Équivalences dans d'autres langues
 Termes de base des jeux de plis ; renvoient au français du tableau ci-dessus. Compléter à chaque jeu.

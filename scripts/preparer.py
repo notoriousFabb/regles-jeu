@@ -3,7 +3,8 @@ Usage : python -X utf8 preparer.py "<chemin du livret.pdf>" "<Nom du jeu>" [--la
 (scan sans --langue-ocr : lu en japonais si Windows le sait et que le texte en est, sinon en anglais)
 
 - nettoie le nom du jeu pour Windows (virgules, ! et caractères interdits retirés) ;
-- crée <Ludothèque>/_outils/<Jeu>/ (Ludothèque = dossier parent de « A traduire », sinon dossier du PDF) ;
+- crée <Ludothèque>/_outils/<Jeu>/ (Ludothèque = dossier parent de « A traduire » ou du
+  dossier de jeu <Ludothèque>/<Jeu>/ s'il contient déjà _outils, sinon dossier du PDF) ;
 - détecte un livret scanné (pas de texte) et copie les bons scripts + le modèle de spec (SRC déjà rempli) ;
 - livret à texte : planche d'aperçu, inventaire blocks.txt, extraction et contrôle des polices, devine la langue ;
 - livret scanné : planche d'aperçu et lecture automatique du texte (ocr.py -> zones.py) si la langue est installée ;
@@ -66,7 +67,13 @@ def main():
     jeu = clean_name(sys.argv[2])
     lang_ocr = sys.argv[sys.argv.index("--langue-ocr") + 1] if "--langue-ocr" in sys.argv else None
     folder = os.path.dirname(pdf)
-    ludo = os.path.dirname(folder) if os.path.basename(folder).lower() in ("a traduire", "à traduire") else folder
+    parent = os.path.dirname(folder)
+    if os.path.basename(folder).lower() in ("a traduire", "à traduire"):
+        ludo = parent
+    elif os.path.isdir(os.path.join(parent, "_outils")):  # livret déjà rangé dans <Ludothèque>/<Jeu>/
+        ludo = parent
+    else:
+        ludo = folder
     tools = os.path.join(ludo, "_outils", jeu)
     if os.path.isfile(os.path.join(tools, "spec.py")):
         sys.exit(f"ERREUR : {tools} contient déjà un spec.py (jeu déjà commencé ?) — rien n'a été modifié")
