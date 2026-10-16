@@ -46,6 +46,9 @@ de l'espace : au-delà de ~0,3 em le texte paraît justifié
 | Lato, MedievalSharp (embarquées complètes) | les mêmes, copiées depuis le PDF | |
 | texte d'un scan, sans serif type Work Sans | Work Sans (graisses fixes extraites de la police variable) | fontTools instancer |
 | texte japonais dense d'un scan | Arial Narrow + Segoe UI Symbol pour ①…⑦, ※ | Windows |
+| symboles ①…⑳, ❶…❿, ◆, ★, ■ absents (ou minuscules) dans la police du texte | Segoe UI Symbol (`seguisym.ttf`), en `<span>` | Windows |
+| linéale humaniste d'un scan anglais | Alegreya Sans | Google Fonts |
+| titres rétro sur bandeau | Righteous | Google Fonts |
 
 Ces polices sont déjà dans le dossier `ff/` des jeux traduits (voir la colonne Polices de l'index `LISEZMOI.md`) : les
 copier plutôt que retélécharger.

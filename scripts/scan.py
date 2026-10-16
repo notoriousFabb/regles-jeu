@@ -97,9 +97,11 @@ def recouvrir():
         doc[pno].draw_rect(r, color=None, fill=col, overlay=True)
     for tag, z, r in texts:
         page = doc[z["page"]]
-        pad = z.get("pad", 0.5)
+        # zone d'une seule ligne : interligne 1.0 et marge négative, sinon la police est réduite pour rien
+        one = r.height < 1.8 * z.get("size", 7) and not re.search(r"<br|<p\b|<li\b|<div\b", z["html"])
+        pad = z.get("pad", -0.6 if one else 0.5)
         st = (f"font-family:{z.get('fam', spec.BODY)};font-size:{z.get('size', 7)}pt;"
-              f"line-height:{z.get('lead', 1.15)};color:{z.get('color', '#000000')};"
+              f"line-height:{z.get('lead', 1.0 if one else 1.15)};color:{z.get('color', '#000000')};"
               f"text-align:{z.get('align', 'left')};font-weight:{'bold' if z.get('bold') else 'normal'};"
               f"font-style:{'italic' if z.get('ital') else 'normal'};")
         html = f'<div style="{st}">{typo(z["html"])}</div>'

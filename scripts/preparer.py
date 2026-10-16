@@ -16,8 +16,9 @@ import pymupdf
 HERE = os.path.dirname(os.path.abspath(__file__))
 TEXT_SCRIPTS = ["build.py", "commun.py", "controle.py", "dump.py", "polices.py", "side.py", "ranger.py",
                 "livrer.py", "relecture.py"]
-SCAN_SCRIPTS = ["scan.py", "controle.py", "grille.py", "bandes.py", "side.py", "ranger.py", "livrer.py", "ocr.py",
-                "relecture.py"]
+SCAN_SCRIPTS = ["scan.py", "controle.py", "grille.py", "bandes.py", "icone.py", "side.py", "ranger.py", "livrer.py",
+                "ocr.py", "relecture.py"]
+SYMBOLS = os.path.join(os.environ.get("WINDIR", r"C:\Windows"), "Fonts", "seguisym.ttf")  # ①❶◆★ des scans
 RESERVED = {"CON", "PRN", "AUX", "NUL"} | {f"COM{i}" for i in range(1, 10)} | {f"LPT{i}" for i in range(1, 10)}
 STOP = {"anglais": "the and of to is you your player card cards each with".split(),
         "allemand": "der die das und ist den mit karten spieler eine".split(),
@@ -90,6 +91,8 @@ def main():
 
     for f in (SCAN_SCRIPTS if scan else TEXT_SCRIPTS):
         shutil.copy(os.path.join(HERE, f), tools)
+    if scan and os.path.isfile(SYMBOLS):
+        shutil.copy(SYMBOLS, os.path.join(tools, "ff"))
     model = open(os.path.join(HERE, "spec_scan_modele.py" if scan else "spec_modele.py"), encoding="utf8").read()
     model = re.sub(r'^SRC = r"CHEMIN/VERS/[^"]*"  # A ADAPTER$', lambda m: "import os\n" + src_line, model,
                    flags=re.M)

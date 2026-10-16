@@ -177,8 +177,16 @@ au choix :
 Le texte de l'image est lu automatiquement (`ocr.py`, moteur de Windows, résolution adaptée à celle du scan ;
 japonais choisi seul quand le livret en contient) et regroupé en paragraphes
 avec leur position (`zones.py`), ce qui évite de recopier le texte à la main. Sans la langue installée dans
-Windows (souvent le cas du japonais), Claude lit les pages en images, ce qui coûte plus cher. Détails :
-`references/scan.md`.
+Windows (souvent le cas du japonais), Claude lit les pages en images, ce qui coûte plus cher.
+
+Pour le rendu « recouvrir », la skill sait aussi :
+- poser les symboles ①❶◆★ avec une police de Windows (Segoe UI Symbol, copiée d'office) quand celle du texte
+  ne les a pas ;
+- découper une icône de l'original (`icone.py`) pour la remettre dans la phrase française ;
+- refaire les titres sur bandeau ou sur pastille, en élargissant le bandeau si le français est plus long ;
+- garder à leur taille les zones d'une seule ligne (interligne et marge resserrés d'office).
+
+Détails : `references/scan.md`.
 
 ---
 
@@ -249,6 +257,7 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
   - `dump.py` : inventaire du texte (`blocks.txt`) ; `polices.py` : extraction, contrôle des accents,
     comparaison et largeur des polices ; `ocr.py` : lecture du texte des scans ;
   - `grille.py` / `bandes.py` : mesures de position sur les scans ;
+  - `icone.py` : découpe une icône d'un scan pour la remettre dans le texte français ;
   - `sheet.py` / `side.py` : planche d'aperçu et images côte à côte original / français ;
   - `relecture.py` : relecture du texte seul ;
   - `livrer.py` : livraison ; `ranger.py` : allègement du dossier d'outils.
