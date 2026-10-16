@@ -12,6 +12,7 @@ Termes généraux, réutilisables d'un jeu à l'autre. Le vocabulaire propre à 
 | round / game | manche / partie |
 | hand / deal / deck | main / distribuer / paquet |
 | draw pile / draw display / discard | pioche / rivière / défausse |
+| unused deck (cartes écartées, non jouées) | paquet non utilisé (choix de l'utilisateur, pas « talon ») |
 | rank / suit | valeur / couleur |
 | score / scoring / score pile | marquer / décompte / pile de score |
 | bid (Numberwang) / auction (Vazerneiros) | annonce / enchère |
