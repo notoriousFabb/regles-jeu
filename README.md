@@ -9,9 +9,9 @@ Il suffit de déposer le PDF dans un dossier et de demander à Claude Code « tr
 le reste : préparation, traduction, construction du PDF, contrôles, relecture, rangement.
 
 Testée sur des livrets de jeux de plis et de cartes : Trick to the Future, Numberwang±, Fright Factor,
-Dr. Science, Tricklings / Vazerneiros, Merge Take, Pack Tricks et The Good Farmer (anglais), Fagioli (règle
-anglaise d'un jeu japonais), This is from that customer over there (japonais), et trois livrets **scannés** : Shinobi Blade (japonais), After You Betobeto-san
-et The Final Bosses' Blues (anglais).
+Dr. Science, Tricklings / Vazerneiros, Merge Take, Pack Tricks, The Good Farmer et Poker Avoces (anglais), This
+is from that customer over there et Fagioli (japonais), et quatre livrets **scannés** : Shinobi Blade (japonais),
+After You Betobeto-san, The Final Bosses' Blues et Man Eating House (anglais).
 
 ---
 
@@ -189,7 +189,9 @@ valeur" » (voir [plus bas](#corriger-une-traduction-déjà-faite)).
    #    page ↑   ↑ bloc 18 de l'inventaire     ↑ français (<b>, <i>, <br/>, {} = icône suivante)
    ```
    La mise en page (colonnes, pastilles, insécables) est trouvée par le moteur ; le spec ne contient des
-   réglages (`x1=`, `fix=`, `COLUMNS`) que pour corriger un cas raté.
+   réglages (`x1=`, `fix=`, `COLUMNS`) que pour corriger un cas raté. Pour dessiner sous le français (élargir un
+   bandeau de titre trop court, remplacer un drapeau), le spec peut fournir une fonction `AVANT_TEXTE`, appelée
+   entre l'effacement de l'original et la pose du français.
 4. **Construire** (`build.py`) : efface le texte d'origine, pose le français et les icônes, et écrit un journal :
    police réduite, débordement, icône non replacée, **texte non traduit**, **à vérifier** (voir plus bas).
 5. **Relire** : texte et mise en page, par deux agents relecteurs ; Claude vérifie chaque point signalé avant de
@@ -229,6 +231,10 @@ Détails : `references/scan.md`.
 - **À VÉRIFIER** : français qui chevauche une image, un autre texte ou un reste de texte d'origine, ou qui sort
   de la page ; sur un scan, ligne d'origine qui dépasse d'un masque.
 - **DÉBORDE / police réduite** : le français ne tient pas à la taille d'origine.
+- **flux protégé / réécriture du flux annulée** : avant d'effacer le texte d'origine, `build.py` réécrit
+  certaines pages (livrets InDesign japonais) pour éviter que des lignes voisines se décalent ou disparaissent,
+  ou que des images cachées réapparaissent ; si cela fait bouger le moindre mot, la réécriture est annulée et
+  la page est à regarder de près.
 
 **Relecture du texte** (`relecture.py`) : écrit `texte_fr.txt` (original et français, paragraphe par paragraphe)
 et signale les mots inconnus du dictionnaire, les fautes de typographie, l'anglais resté, les termes du glossaire
@@ -285,8 +291,8 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
   - `glossaire.md` : vocabulaire de jeu commun à tous les jeux, avec équivalences par langue ;
   - `polices.md` : polices de remplacement déjà trouvées pour des polices de livrets ;
   - `pieges.md` : cas difficiles rencontrés et leurs solutions (texte en double, calques cachés, icônes,
-    mini-cartes, soulignements, marges de paragraphe, texte qui réapparaît et images cachées qui ressortent
-  après l'effacement…).
+    mini-cartes, soulignements, marges de paragraphe, lignes décalées ou images cachées qui ressortent à
+    l'effacement…).
 - `scripts/`
   - `preparer.py` : démarre un livret (voir plus haut) ;
   - `build.py` : moteur des livrets à texte ; `scan.py` : moteur des livrets scannés ; `commun.py` : fonctions
