@@ -8,6 +8,9 @@
   mesurée autour, et le français est posé dedans, police réduite automatiquement pour tenir. Limites à
   annoncer : sur fond texturé ou dégradé le masque se voit (aplat), le texte écrit dans les illustrations reste
   en langue d'origine sauf zone dédiée, et le français est souvent très petit sur un livret dense.
+  **Lettres en tracés vectoriels** (pas de texte, mais pas une image non plus : `page.get_drawings()` rend des
+  centaines de petits tracés, cas de Bird Club) : `VECTEUR = True` dans le spec, les lettres sont supprimées
+  au lieu d'être masquées et le fond reste intact (pas d'aplat visible).
 - **« cote »** (le plus fiable) : chaque page d'origine à gauche, sa traduction complète à droite ; une page de
   plus si la traduction est longue (`PAGES[page] = "<h3>…</h3><p>…</p>"`).
 

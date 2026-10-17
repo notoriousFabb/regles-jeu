@@ -9,8 +9,14 @@ MODE "recouvrir" : ZONES = rectangles de texte de l'image ; chacun est masqué p
         lead (interligne en multiple de la taille, défaut 1.15), pad (marge intérieure, défaut 0.5 ; zone d'une
         seule ligne : lead 1.0 et pad -0.6 d'office),
         bg ("auto" = couleur du fond autour de la zone, "#rrggbb", None = ne pas masquer),
-        en ("texte d'origine", repris de zones.py : sert à relecture.py)
+        en ("texte d'origine", repris de zones.py : sert à relecture.py),
+        rot (90, -90 ou 180 : texte tourné, pour une étiquette verticale ; la zone reste celle de l'image)
     M(page, (x0, y0, x1, y1), bg="auto") — masque seul (effacer un texte sans le remplacer)
+    VECTEUR = True : livret dont les lettres sont des tracés vectoriels (texte vectorisé, pas une image) : les
+        tracés de lettres de chaque zone sont supprimés au lieu d'être masqués par un aplat, le fond d'origine
+        (dégradé, illustration) reste intact sous le français. Une zone avec bg="#rrggbb" reçoit en plus un aplat.
+        VECTEUR_MARGE (défaut 1.2 pt) : marge autour de la zone ; VECTEUR_LETTRE (défaut 12 pt) : taille
+        maximale d'un tracé pris pour une lettre (au-delà, morceau d'illustration gardé).
 MODE "cote" : PAGES = {page: html} ; chaque page d'origine à gauche, sa traduction complète à droite.
     SIDE_WIDTH (largeur de la colonne française en multiple de la page, défaut 1.0), SIDE_STYLE (style du texte),
     SIDE_MARGIN, SIDE_GAP. Si la traduction est trop longue, elle continue sur une page de plus.

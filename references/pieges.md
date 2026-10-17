@@ -11,7 +11,21 @@ La plupart sont déjà gérés par `scripts/build.py` ; ce qui reste à faire da
   signale tout écart). Lettres cerclées A/B/C (cercle vectoriel + lettre texte) : voir la version de
   `_outils/Dr_Science/build.py`.
 - **Puces dans le texte** (« •\t », « 1.\t » dans la même span) : `bullet="•"` ou `bullet="1."`, le retrait
-  est conservé.
+  est conservé. Puces des livrets japonais (●, 〇, ・, ■, ◆, ▶, ①…⑳, ❶…❿) aussi : `L(src, html, bullet="●")`,
+  le français commence après la puce et son blanc (un 「 collé à la puce est pris en compte) ; inutile de
+  donner `x0` à la main.
+- **Étiquettes penchées** (« Connected! » en biais sur une illustration, ligne de direction non horizontale) :
+  `INCLINEES = [(page, "texte exact de la ligne", "français"), …]` dans le spec. Le moteur efface la ligne
+  et pose le français au même angle, même couleur, même police (`CODE`), centré sur l'original, réduit s'il
+  dépasse de plus de 20 %. Ne pas les mettre dans un flux ni dans `IGNORE`. Journal : « étiquette inclinée »
+  (ou « introuvable » si le texte ne correspond pas exactement à la ligne de `blocks.txt`).
+- **Lettres doublées d'un contour** (titres décoratifs : le texte est imprimé, puis chaque lettre redessinée
+  en tracé avec un contour blanc ou coloré ; après traduction il reste des lettres fantômes) :
+  `CONTOURS = {page: [(x0, y0, x1, y1), …]}` = rectangles des titres concernés. Le moteur garde ces tracés
+  mais ne les peint plus. Ne pas les effacer par une redaction (`REMOVE_IF_TOUCHED`) : elle emporte aussi
+  les dégradés et motifs voisins (vagues de Hyakuju Parade). Le contour d'origine n'est pas recréé autour du
+  français (compromis à signaler). Journal : « N contour(s) de lettres effacé(s) » ; 0 = lettres dessinées
+  autrement, à regarder de près.
 - **Numéros dans des pastilles** dessinées à gauche (étapes 1-5) : un flux par étape, ancré à sa position
   d'origine (maxy = début de l'étape suivante), sinon les pastilles ne suivent plus le texte.
 - **Texte qui contourne une image** (lignes à côté d'une carte, puis pleine largeur) : couper le français en
