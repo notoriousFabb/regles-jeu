@@ -39,6 +39,7 @@ Termes généraux, réutilisables d'un jeu à l'autre. Le vocabulaire propre à 
 | restriction / binding (Shinobi Blade, JP 縛り) | contrainte (de couleur / de nombre) |
 | high risk / low risk betting zones (JP ハイリスク / ローリスク) | zone Risque élevé / Risque faible |
 | lead color | couleur demandée |
+| Must Follow (rule) | obligation de suivre (choix de l'utilisateur, pas « obligation de fournir ») |
 | Team cards (Pack Tricks) | cartes Équipe |
 | Trump Suit Indicator | indicateur d'atout |
 | Starting / Initial Lead Player | premier meneur |

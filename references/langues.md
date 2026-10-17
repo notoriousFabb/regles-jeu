@@ -15,5 +15,8 @@ Conséquences :
   français : `preparer.py` affiche les manques.
 - **Texte vertical** (japonais, `d0.00,1.00` dans `blocks.txt`) : le build ne pose que du texte horizontal ;
   traduire en horizontal dans la même zone si la place le permet, sinon le signaler.
+- **Jeu japonais** : chercher d'abord sa fiche sur le Tokyo Game Market (gamemarket.jp) et le manuel de
+  l'auteur — titre, noms en lettres latines, errata, et comparaison si le livret est une traduction
+  (`source.md`).
 - **Glossaire** : `glossaire.md` a un tableau anglais et des équivalences par langue ; passer par le terme
   français retenu.

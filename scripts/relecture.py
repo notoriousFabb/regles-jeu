@@ -30,6 +30,7 @@ EXTRA_OK = {"entameur", "entameurs", "défausse", "défausses", "défausser", "p
 
 def text_of(h):
     h = re.sub(r"<br\s*/?>|</p>|</div>|</li>", "\n", h)
+    h = re.sub(r"<img\b[^>]*>", "[icône]", h)
     h = re.sub(r"<[^>]+>", "", h).replace("{}", "[icône]")
     h = htmlmod.unescape(h).replace(" ", " ")
     return re.sub(r"[ \t]+", " ", re.sub(r"\n\s*", " / ", h)).strip(" /")

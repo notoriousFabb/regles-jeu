@@ -9,8 +9,9 @@ Il suffit de déposer le PDF dans un dossier et de demander à Claude Code « tr
 le reste : préparation, traduction, construction du PDF, contrôles, relecture, rangement.
 
 Testée sur des livrets de jeux de plis et de cartes : Trick to the Future, Numberwang±, Fright Factor,
-Dr. Science, Tricklings / Vazerneiros, Merge Take et Pack Tricks (anglais), This is from that customer over
-there (japonais), et deux livrets **scannés** : Shinobi Blade (japonais) et After You Betobeto-san (anglais).
+Dr. Science, Tricklings / Vazerneiros, Merge Take, Pack Tricks et The Good Farmer (anglais), This is from that
+customer over there (japonais), et trois livrets **scannés** : Shinobi Blade (japonais), After You Betobeto-san
+et The Final Bosses' Blues (anglais).
 
 ---
 
@@ -97,9 +98,28 @@ Déposer le PDF dans `A traduire/`, ouvrir Claude Code dans ce dossier et demand
 
 > Traduis-moi ce livret de règles : MonJeu_rules.pdf
 
-ou simplement « traduis la règle » s'il n'y a qu'un PDF. Claude annonce la langue, le nombre de pages et le type
+ou simplement « traduis la règle » s'il n'y a qu'un PDF. On peut aussi donner le chemin d'un PDF ou d'un dossier
+situé ailleurs.
+
+**Plusieurs PDF dans le dossier** : Claude les liste (en regroupant ceux d'un même jeu : règles et extension,
+livret et aide de jeu), indique le coût estimé (environ 150 000 à 200 000 jetons par livret) et demande s'il faut
+tout traduire ou un seul livret ; il ne commence rien avant la réponse. « Tout » : les livrets sont traduits un
+par un, avec un court bilan après chacun ; un livret qui pose un vrai problème (police introuvable, scan
+illisible…) est mis de côté et signalé, et les autres continuent.
+
+Pour chaque livret, Claude annonce la langue, le nombre de pages et le type
 de livret (à texte ou scanné), pose une question seulement si c'est nécessaire (par exemple le rendu d'un livret
 scanné), traduit, vérifie, puis range. À la fin, il résume : fichier produit, choix de vocabulaire, compromis.
+
+**Livret seulement consultable en ligne** (lien Google Drive sans téléchargement) : donner le lien à Claude. Il
+cherche d'abord un PDF téléchargeable (site de l'éditeur, BoardGameGeek), sinon, avec votre accord, récupère
+les pages en images par le navigateur et les assemble en PDF, traité ensuite comme un livret scanné
+(`references/en-ligne.md`).
+
+**Jeu japonais** : Claude cherche toujours d'abord la fiche du jeu sur le Tokyo Game Market (gamemarket.jp)
+et le manuel de l'auteur (titre officiel, noms en lettres latines, errata). Si le livret est lui-même une
+traduction (règle anglaise d'un jeu japonais, aide de jeu de fan), il la compare à l'original, signale les écarts
+et traduit en suivant l'original (`references/source.md`). Pour les autres langues, il le propose.
 
 Pour corriger une traduction existante : « dans Merge Take, remplace "la plus forte" par "de plus haute
 valeur" » (voir [plus bas](#corriger-une-traduction-déjà-faite)).
@@ -136,7 +156,12 @@ valeur" » (voir [plus bas](#corriger-une-traduction-déjà-faite)).
   Type | Polices | Date). Claude y cherche par mot-clé (éditeur, police) au lieu de le lire en entier, et ne
   lit le `NOTES.md` que des jeux proches : un nouveau livret du même éditeur réutilise ses polices et son
   vocabulaire.
-- Si le PDF n'est pas dans `A traduire/`, les outils sont créés à côté du PDF et rien n'est déplacé.
+- **Nom du fichier traduit** : le code de langue final est remplacé par `_FR` s'il est séparé du nom
+  (« MergeTake_EN.pdf » → « MergeTake_FR.pdf », « Shinobi Blade.pdf » → « Shinobi Blade_FR.pdf »).
+- **Retraduction** d'un livret déjà rangé dans `<Jeu>/` : les outils vont dans `_outils/<Jeu>/` et rien n'est
+  déplacé.
+- Si le PDF n'est ni dans `A traduire/` ni dans un dossier de jeu, les outils sont créés à côté du PDF et rien
+  n'est déplacé.
 
 ---
 
@@ -177,8 +202,16 @@ au choix :
 Le texte de l'image est lu automatiquement (`ocr.py`, moteur de Windows, résolution adaptée à celle du scan ;
 japonais choisi seul quand le livret en contient) et regroupé en paragraphes
 avec leur position (`zones.py`), ce qui évite de recopier le texte à la main. Sans la langue installée dans
-Windows (souvent le cas du japonais), Claude lit les pages en images, ce qui coûte plus cher. Détails :
-`references/scan.md`.
+Windows (souvent le cas du japonais), Claude lit les pages en images, ce qui coûte plus cher.
+
+Pour le rendu « recouvrir », la skill sait aussi :
+- poser les symboles ①❶◆★ avec une police de Windows (Segoe UI Symbol, copiée d'office) quand celle du texte
+  ne les a pas ;
+- découper une icône de l'original (`icone.py`) pour la remettre dans la phrase française ;
+- refaire les titres sur bandeau ou sur pastille, en élargissant le bandeau si le français est plus long ;
+- garder à leur taille les zones d'une seule ligne (interligne et marge resserrés d'office).
+
+Détails : `references/scan.md`.
 
 ---
 
@@ -205,7 +238,8 @@ corriger.
 ---
 
 ## Coût en jetons et modèles
-Une traduction consomme beaucoup de jetons, surtout à cause des images. La skill limite ce coût de plusieurs
+Une traduction consomme beaucoup de jetons, surtout à cause des images : compter environ 150 000 à 200 000
+jetons pour un livret de quelques pages, davantage pour un scan ou un long livret. La skill limite ce coût de plusieurs
 façons :
 - **les scripts font le travail mécanique** : préparation, inventaire, construction, contrôles, rangement ;
 - **les images ne servent qu'à bon escient** : planches à faible résolution, agrandissements seulement sur ce qui
@@ -237,10 +271,12 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
   - `dossiers.md` : organisation des dossiers, noms de jeux, index et notes ;
   - `langues.md` : langue de départ, livrets multilingues, longueur du français selon la langue, texte vertical ;
   - `scan.md` : livrets scannés (lecture automatique, zones, rendus) ;
+  - `en-ligne.md` : récupérer un livret seulement consultable en ligne (Google Drive) ;
+  - `source.md` : vérifier une règle traduite contre l'original (Tokyo Game Market pour les jeux japonais) ;
   - `glossaire.md` : vocabulaire de jeu commun à tous les jeux, avec équivalences par langue ;
   - `polices.md` : polices de remplacement déjà trouvées pour des polices de livrets ;
   - `pieges.md` : cas difficiles rencontrés et leurs solutions (texte en double, calques cachés, icônes,
-    mini-cartes, soulignements…).
+    mini-cartes, soulignements, marges de paragraphe…).
 - `scripts/`
   - `preparer.py` : démarre un livret (voir plus haut) ;
   - `build.py` : moteur des livrets à texte ; `scan.py` : moteur des livrets scannés ; `commun.py` : fonctions
@@ -249,6 +285,7 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
   - `dump.py` : inventaire du texte (`blocks.txt`) ; `polices.py` : extraction, contrôle des accents,
     comparaison et largeur des polices ; `ocr.py` : lecture du texte des scans ;
   - `grille.py` / `bandes.py` : mesures de position sur les scans ;
+  - `icone.py` : découpe une icône d'un scan pour la remettre dans le texte français ;
   - `sheet.py` / `side.py` : planche d'aperçu et images côte à côte original / français ;
   - `relecture.py` : relecture du texte seul ;
   - `livrer.py` : livraison ; `ranger.py` : allègement du dossier d'outils.
