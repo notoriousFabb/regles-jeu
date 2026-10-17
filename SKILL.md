@@ -42,6 +42,8 @@ Scripts : `scripts/` à côté de ce fichier ; `preparer.py` copie ceux qu'il fa
    planche d'aperçu, l'inventaire `blocks.txt`, extrait les polices et signale les accents manquants, devine
    la langue (`references/langues.md`), lit le texte des scans (OCR → `zones.py`) et liste les jeux déjà
    traduits qui ont les mêmes polices. Regarder la planche, annoncer langue, pages, type.
+   **Note déjà présente** : `_outils/<Jeu>/NOTES.md` peut exister avant la préparation (section « Sources »
+   écrite par la skill recherche-regles-jeu) ; la lire et réutiliser ses liens au lieu de les rechercher.
    **Jeu japonais** (livret japonais ou déjà traduit) : toujours chercher sa fiche sur le Tokyo Game Market
    (gamemarket.jp) et le manuel de l'auteur avant d'écrire le spec ; règle traduite ou aide de fan : la
    comparer à l'original et signaler les écarts — `references/source.md`.
@@ -75,7 +77,7 @@ Scripts : `scripts/` à côté de ce fichier ; `preparer.py` copie ceux qu'il fa
    avant de corriger ; ne rien corriger « de mémoire ». Corriger, reconstruire, et pour une petite correction
    regarder soi-même la seule page modifiée plutôt que de relancer les agents.
 6. **Livrer** : écrire `_outils/<Jeu>/NOTES.md` (langue d'origine, éditeur, type, polices, vocabulaire propre
-   au jeu, choix, compromis, astuces du spec), puis
+   au jeu, choix, compromis, astuces du spec ; garder la section « Sources » si elle existe déjà), puis
    `python -X utf8 livrer.py "<Ludothèque>/_outils/<Jeu>"` (`--remplacer` seulement si l'utilisateur l'a
    accepté). Il déplace l'original dans `<Jeu>/`, met `SRC` à jour, allège le dossier d'outils (`ranger.py` :
    polices réduites au français et sans ligatures), reconstruit, copie `<nom>_FR.pdf`, met l'index à jour.
