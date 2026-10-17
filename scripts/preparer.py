@@ -1,7 +1,9 @@
 """Démarre la traduction d'un livret : un seul appel au lieu d'une dizaine d'étapes.
 Usage : python -X utf8 preparer.py "<chemin du livret.pdf>" "<Nom du jeu>" [--langue-ocr de-DE]
+                                   [--nom-fichier "<nom en lettres latines>"]
 (scan sans --langue-ocr : lu en japonais si Windows le sait et que le texte en est, sinon en anglais)
 
+- livret nommé en écriture non latine (japonais, chinois…) : refusé sans --nom-fichier, qui le renomme sur place ;
 - nettoie le nom du jeu pour Windows (virgules, ! et caractères interdits retirés) ;
 - crée <Ludothèque>/_outils/<Jeu>/ (Ludothèque = dossier parent de « A traduire » ou du
   dossier de jeu <Ludothèque>/<Jeu>/ s'il contient déjà _outils, sinon dossier du PDF) ;
@@ -19,6 +21,7 @@ TEXT_SCRIPTS = ["build.py", "commun.py", "controle.py", "dump.py", "polices.py",
 SCAN_SCRIPTS = ["scan.py", "controle.py", "grille.py", "bandes.py", "icone.py", "side.py", "ranger.py", "livrer.py",
                 "ocr.py", "relecture.py"]
 SYMBOLS = os.path.join(os.environ.get("WINDIR", r"C:\Windows"), "Fonts", "seguisym.ttf")  # ①❶◆★ des scans
+NON_LATIN = re.compile(r"[Ͱ-῿　-鿿가-힯＀-￯]")  # grec, cyrillique, CJK…
 RESERVED = {"CON", "PRN", "AUX", "NUL"} | {f"COM{i}" for i in range(1, 10)} | {f"LPT{i}" for i in range(1, 10)}
 STOP = {"anglais": "the and of to is you your player card cards each with".split(),
         "allemand": "der die das und ist den mit karten spieler eine".split(),
@@ -78,6 +81,18 @@ def main():
     tools = os.path.join(ludo, "_outils", jeu)
     if os.path.isfile(os.path.join(tools, "spec.py")):
         sys.exit(f"ERREUR : {tools} contient déjà un spec.py (jeu déjà commencé ?) — rien n'a été modifié")
+    stem = os.path.splitext(os.path.basename(pdf))[0]
+    if "--nom-fichier" in sys.argv:  # nom en lettres latines pour un livret nommé en japonais, chinois…
+        new = clean_name(sys.argv[sys.argv.index("--nom-fichier") + 1]).removesuffix(".pdf")
+        dest = os.path.join(folder, new + ".pdf")
+        if os.path.exists(dest):
+            sys.exit(f"ERREUR : {dest} existe déjà — rien n'a été modifié")
+        os.rename(pdf, dest)
+        print(f"Livret renommé : {stem}.pdf → {new}.pdf")
+        pdf = dest
+    elif NON_LATIN.search(stem):
+        sys.exit(f"ERREUR : nom de fichier en écriture non latine ({stem}.pdf) — relancer avec "
+                 f'--nom-fichier "<nom en lettres latines>" — rien n\'a été modifié')
     os.makedirs(os.path.join(tools, "ff"), exist_ok=True)
 
     doc = pymupdf.open(pdf)
