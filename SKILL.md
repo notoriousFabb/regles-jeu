@@ -42,6 +42,13 @@ Scripts : `scripts/` à côté de ce fichier ; `preparer.py` copie ceux qu'il fa
    planche d'aperçu, l'inventaire `blocks.txt`, extrait les polices et signale les accents manquants, devine
    la langue (`references/langues.md`), lit le texte des scans (OCR → `zones.py`) et liste les jeux déjà
    traduits qui ont les mêmes polices. Regarder la planche, annoncer langue, pages, type.
+   **Nom de fichier en japonais, chinois…** : `preparer.py` refuse ; relancer avec `--nom-fichier "<nom>"`,
+   qui renomme le livret sur place (le `_FR.pdf` en découle). Nom : le titre `<Jeu>` en lettres latines
+   (titre anglais officiel s'il existe, sinon la romanisation imprimée), puis les autres mots du nom traduits
+   en anglais (説明書, ルール, ルールブック → `Rules` ; 正誤表 → `Errata` ; 拡張 → `Expansion` ; サマリー →
+   `Summary`), en gardant langue, version et date (`_JP`, `v1.2`) : `コスモショーファー_JP_Rule_v1.2.pdf` →
+   `Cosmo Chauffeur_JP_Rule_v1.2.pdf`, `夜連_説明書.pdf` → `Who follows me_Rules.pdf`. Noter l'ancien nom dans
+   `NOTES.md` (section « Sources » s'il y en a une : « renommé en … »).
    **Note déjà présente** : `_outils/<Jeu>/NOTES.md` peut exister avant la préparation (section « Sources »
    écrite par la skill recherche-regles-jeu) ; la lire et réutiliser ses liens au lieu de les rechercher.
    **Jeu japonais** (livret japonais ou déjà traduit) : toujours chercher sa fiche sur le Tokyo Game Market

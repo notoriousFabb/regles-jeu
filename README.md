@@ -159,10 +159,13 @@ valeur" » (voir [plus bas](#corriger-une-traduction-déjà-faite)).
   lit le `NOTES.md` que des jeux proches : un nouveau livret du même éditeur réutilise ses polices et son
   vocabulaire.
 - **Nom du fichier traduit** : la mention de langue est retirée et `_FR` ajouté à la fin
-  (« MergeTake_EN.pdf » → « MergeTake_FR.pdf », « Shinobi Blade.pdf » → « Shinobi Blade_FR.pdf »,
-  « Man Eating House ENG Rules.pdf » → « Man Eating House Rules_FR.pdf »). Au milieu du nom, seules les
-  abréviations en capitales (EN, ENG, JP…) et les noms de langue en toutes lettres (English, Japanese…) sont
-  retirés, pour ne pas toucher un mot du titre (« Take It Easy »).
+  (« MergeTake_EN.pdf » → « MergeTake_FR.pdf », « Shinobi Blade.pdf » → « Shinobi Blade_FR.pdf »). Au milieu du
+  nom, seule une mention en capitales ou en toutes lettres est retirée (« Jeu ENG Rules.pdf » →
+  « Jeu Rules_FR.pdf »).
+- **Livret nommé en japonais, chinois…** : il est d'abord renommé en lettres latines, titre anglais officiel
+  de préférence et autres mots traduits en anglais (« 夜連_説明書.pdf » → « Who follows me_Rules.pdf »,
+  « コスモショーファー_JP_Rule_v1.2.pdf » → « Cosmo Chauffeur_JP_Rule_v1.2.pdf »), ce qui donne un `_FR.pdf`
+  lisible partout. L'ancien nom est noté dans `NOTES.md`.
 - **Retraduction** d'un livret déjà rangé dans `<Jeu>/` : les outils vont dans `_outils/<Jeu>/` et rien n'est
   déplacé.
 - Si le PDF n'est ni dans `A traduire/` ni dans un dossier de jeu, les outils sont créés à côté du PDF et rien
