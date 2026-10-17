@@ -140,8 +140,16 @@ def main():
            f"{font_families(os.path.join(tools, 'ff'))} | {datetime.date.today().isoformat()} |")
     index = os.path.join(ludo, "_outils", "LISEZMOI.md")
     text = open(index, encoding="utf8").read() if os.path.isfile(index) else HEADER
-    rows = [l for l in text.splitlines() if l.startswith(f"| {jeu} |")]
-    text = text.replace(rows[0], row) if rows else text.rstrip("\n") + "\n" + row + "\n"
+    lines = text.rstrip("\n").split("\n")
+    rows = [i for i, l in enumerate(lines) if l.startswith(f"| {jeu} |")]
+    table = [i for i, l in enumerate(lines) if l.startswith("|")]
+    if rows:
+        lines[rows[0]] = row
+    elif table:  # new row right after the table's last row, not after the notes that follow it
+        lines.insert(table[-1] + 1, row)
+    else:
+        lines.append(row)
+    text = "\n".join(lines) + "\n"
     open(index, "w", encoding="utf8").write(text)
     print(f"index : {row}")
     if not os.path.isfile(notes):

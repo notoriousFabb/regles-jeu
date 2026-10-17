@@ -9,8 +9,8 @@ Il suffit de déposer le PDF dans un dossier et de demander à Claude Code « tr
 le reste : préparation, traduction, construction du PDF, contrôles, relecture, rangement.
 
 Testée sur des livrets de jeux de plis et de cartes : Trick to the Future, Numberwang±, Fright Factor,
-Dr. Science, Tricklings / Vazerneiros, Merge Take, Pack Tricks et The Good Farmer (anglais), This is from that
-customer over there (japonais), et trois livrets **scannés** : Shinobi Blade (japonais), After You Betobeto-san
+Dr. Science, Tricklings / Vazerneiros, Merge Take, Pack Tricks et The Good Farmer (anglais), Fagioli (règle
+anglaise d'un jeu japonais), This is from that customer over there (japonais), et trois livrets **scannés** : Shinobi Blade (japonais), After You Betobeto-san
 et The Final Bosses' Blues (anglais).
 
 ---
@@ -35,7 +35,8 @@ et The Final Bosses' Blues (anglais).
 - **Détecte la langue** du livret (pas besoin de la préciser) et l'annonce ; ne pose une question que si le
   livret est multilingue ou déjà en partie en français.
 - **Retire le texte d'origine** du PDF sans toucher aux images ni aux dessins vectoriels (traits de
-  soulignement compris).
+  soulignement compris), et sans décaler le texte voisin ni faire ressortir des images cachées (pièges de
+  certains livrets InDesign, protégés automatiquement).
 - **Pose le texte français au même endroit**, avec des polices libres proches de l'originale (les polices
   embarquées n'ont presque jamais tous les accents), et réduit légèrement la taille si le français est plus long.
 - **Trouve seule la mise en page** : colonnes (jusqu'à 4 par page), étapes numérotées posées sur des pastilles,
@@ -111,10 +112,11 @@ Pour chaque livret, Claude annonce la langue, le nombre de pages et le type
 de livret (à texte ou scanné), pose une question seulement si c'est nécessaire (par exemple le rendu d'un livret
 scanné), traduit, vérifie, puis range. À la fin, il résume : fichier produit, choix de vocabulaire, compromis.
 
-**Livret seulement consultable en ligne** (lien Google Drive sans téléchargement) : donner le lien à Claude. Il
-cherche d'abord un PDF téléchargeable (site de l'éditeur, BoardGameGeek), sinon, avec votre accord, récupère
-les pages en images par le navigateur et les assemble en PDF, traité ensuite comme un livret scanné
-(`references/en-ligne.md`).
+**Livret seulement consultable en ligne** (lien Google Drive sans téléchargement) : donner le lien à Claude. Le
+blocage du téléchargement est un choix du propriétaire : Claude ne le contourne pas. Il cherche un PDF
+téléchargeable (site de l'éditeur, BoardGameGeek) ; sinon, il vous propose de demander le fichier au
+propriétaire, ou de lui fournir vos propres captures des pages, qu'il assemble en PDF et traite comme un livret
+scanné (`references/en-ligne.md`).
 
 **Jeu japonais** : Claude cherche toujours d'abord la fiche du jeu sur le Tokyo Game Market (gamemarket.jp)
 et le manuel de l'auteur (titre officiel, noms en lettres latines, errata). Si le livret est lui-même une
@@ -156,8 +158,10 @@ valeur" » (voir [plus bas](#corriger-une-traduction-déjà-faite)).
   Type | Polices | Date). Claude y cherche par mot-clé (éditeur, police) au lieu de le lire en entier, et ne
   lit le `NOTES.md` que des jeux proches : un nouveau livret du même éditeur réutilise ses polices et son
   vocabulaire.
-- **Nom du fichier traduit** : le code de langue final est remplacé par `_FR` s'il est séparé du nom
-  (« MergeTake_EN.pdf » → « MergeTake_FR.pdf », « Shinobi Blade.pdf » → « Shinobi Blade_FR.pdf »).
+- **Nom du fichier traduit** : la mention de langue est retirée et `_FR` ajouté à la fin
+  (« MergeTake_EN.pdf » → « MergeTake_FR.pdf », « Shinobi Blade.pdf » → « Shinobi Blade_FR.pdf »). Au milieu du
+  nom, seule une mention en capitales ou en toutes lettres est retirée (« Jeu ENG Rules.pdf » →
+  « Jeu Rules_FR.pdf »).
 - **Retraduction** d'un livret déjà rangé dans `<Jeu>/` : les outils vont dans `_outils/<Jeu>/` et rien n'est
   déplacé.
 - Si le PDF n'est ni dans `A traduire/` ni dans un dossier de jeu, les outils sont créés à côté du PDF et rien
@@ -271,12 +275,14 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
   - `dossiers.md` : organisation des dossiers, noms de jeux, index et notes ;
   - `langues.md` : langue de départ, livrets multilingues, longueur du français selon la langue, texte vertical ;
   - `scan.md` : livrets scannés (lecture automatique, zones, rendus) ;
-  - `en-ligne.md` : récupérer un livret seulement consultable en ligne (Google Drive) ;
+  - `en-ligne.md` : livret seulement consultable en ligne (Google Drive) : où chercher le PDF, captures de
+    l'utilisateur ;
   - `source.md` : vérifier une règle traduite contre l'original (Tokyo Game Market pour les jeux japonais) ;
   - `glossaire.md` : vocabulaire de jeu commun à tous les jeux, avec équivalences par langue ;
   - `polices.md` : polices de remplacement déjà trouvées pour des polices de livrets ;
   - `pieges.md` : cas difficiles rencontrés et leurs solutions (texte en double, calques cachés, icônes,
-    mini-cartes, soulignements, marges de paragraphe…).
+    mini-cartes, soulignements, marges de paragraphe, texte qui réapparaît et images cachées qui ressortent
+  après l'effacement…).
 - `scripts/`
   - `preparer.py` : démarre un livret (voir plus haut) ;
   - `build.py` : moteur des livrets à texte ; `scan.py` : moteur des livrets scannés ; `commun.py` : fonctions
