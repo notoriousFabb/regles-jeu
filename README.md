@@ -116,6 +116,11 @@ cherche d'abord un PDF téléchargeable (site de l'éditeur, BoardGameGeek), sin
 les pages en images par le navigateur et les assemble en PDF, traité ensuite comme un livret scanné
 (`references/en-ligne.md`).
 
+**Jeu japonais** : Claude cherche toujours d'abord la fiche du jeu sur le Tokyo Game Market (gamemarket.jp)
+et le manuel de l'auteur (titre officiel, noms en lettres latines, errata). Si le livret est lui-même une
+traduction (règle anglaise d'un jeu japonais, aide de jeu de fan), il la compare à l'original, signale les écarts
+et traduit en suivant l'original (`references/source.md`). Pour les autres langues, il le propose.
+
 Pour corriger une traduction existante : « dans Merge Take, remplace "la plus forte" par "de plus haute
 valeur" » (voir [plus bas](#corriger-une-traduction-déjà-faite)).
 
@@ -267,6 +272,7 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
   - `langues.md` : langue de départ, livrets multilingues, longueur du français selon la langue, texte vertical ;
   - `scan.md` : livrets scannés (lecture automatique, zones, rendus) ;
   - `en-ligne.md` : récupérer un livret seulement consultable en ligne (Google Drive) ;
+  - `source.md` : vérifier une règle traduite contre l'original (Tokyo Game Market pour les jeux japonais) ;
   - `glossaire.md` : vocabulaire de jeu commun à tous les jeux, avec équivalences par langue ;
   - `polices.md` : polices de remplacement déjà trouvées pour des polices de livrets ;
   - `pieges.md` : cas difficiles rencontrés et leurs solutions (texte en double, calques cachés, icônes,

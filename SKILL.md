@@ -42,6 +42,9 @@ Scripts : `scripts/` à côté de ce fichier ; `preparer.py` copie ceux qu'il fa
    planche d'aperçu, l'inventaire `blocks.txt`, extrait les polices et signale les accents manquants, devine
    la langue (`references/langues.md`), lit le texte des scans (OCR → `zones.py`) et liste les jeux déjà
    traduits qui ont les mêmes polices. Regarder la planche, annoncer langue, pages, type.
+   **Jeu japonais** (livret japonais ou déjà traduit) : toujours chercher sa fiche sur le Tokyo Game Market
+   (gamemarket.jp) et le manuel de l'auteur avant d'écrire le spec ; règle traduite ou aide de fan : la
+   comparer à l'original et signaler les écarts — `references/source.md`.
    **Scan** : demander le rendu puis suivre `references/scan.md`. Le reste ci-dessous concerne les livrets à texte.
 2. **Polices** (`references/polices.md`) : réutiliser celles d'un jeu proche, sinon choisir des remplaçantes
    (`polices.py glyphes / planche / largeur`), les mettre dans `ff/` et régler en tête de `spec.py` : `CSS`,
