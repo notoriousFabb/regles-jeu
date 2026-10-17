@@ -33,6 +33,7 @@ CODE = need("CODE")
 SIZE_K = getattr(spec, "SIZE_K", {})
 COLUMNS = getattr(spec, "COLUMNS", {})
 IGNORE = getattr(spec, "IGNORE", {})
+AVANT_TEXTE = getattr(spec, "AVANT_TEXTE", None)  # f(page, pno, log) : dessin sous le français (bandeau élargi…)
 OUT = sys.argv[1] if len(sys.argv) > 1 else "out_fr.pdf"
 FF = os.path.join(HERE, "ff")
 MARK = "¤"
@@ -476,6 +477,9 @@ for pno, flows in sorted(by_page.items()):
         page.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE,
                               graphics=pymupdf.PDF_REDACT_LINE_ART_REMOVE_IF_COVERED,
                               text=pymupdf.PDF_REDACT_TEXT_NONE)
+
+    if AVANT_TEXTE:  # spec hook, drawn after the redactions and under the French text
+        AVANT_TEXTE(page, pno, log)
 
     # 2. lay out the French text
     to_draw = []
