@@ -44,6 +44,13 @@ La plupart sont déjà gérés par `scripts/build.py` ; ce qui reste à faire da
   « p. 8 » ou « 1 - 2 = -1 » écrire `&#160;` dans le spec.
 - **Titres longs** (nom d'origine + français) : `T(...)` les garde sur une ligne ; s'ils touchent une image,
   raccourcir le français ou passer `size=`.
+- **Anglais qui réapparaît ailleurs, images cachées qui ressortent** (livrets InDesign japonais, Fagioli) : les
+  redactions de MuPDF décalent ou effacent les lignes voisines quand le texte passe à la ligne par `T*`, `'`
+  ou `"`, et suppriment les masques vides `0 0 m W n` qui cachent des images en double (jetons de travers
+  par-dessus les vrais). Géré par `build.py` (`protect_content`, avant les redactions) : réécriture en
+  `0 -TL Td` et en `0 0 0 0 re W n`, annulée si le texte de la page bouge (journal : « flux protégé… » ou
+  « réécriture du flux annulée »). Si l'anglais revient malgré tout : vérifier `page.search_for()` avant et
+  après une redaction isolée sur une seule ligne.
 - **Marges de paragraphe ignorées** (livret composé avec `pymupdf.Story`) : MuPDF donne à `<p>` une marge
   par défaut de 1em en haut et en bas, que `* {margin:0}` ne remet pas à zéro. Une règle qui ne fixe qu'un
   côté (`p {margin-bottom:6pt}`) laisse l'autre à 1em, qui l'emporte (marges fusionnées) : l'écart reste
