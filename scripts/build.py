@@ -78,9 +78,84 @@ b {{font-weight:bold;}}
 ARCH = pymupdf.Archive(FF)
 FBODY = pymupdf.Font(fontfile=os.path.join(FF, face_file(BODY)))
 
+# ------------------------------------------------------------------ content stream protection (before redactions)
+PDFTOK = re.compile(rb"\((?:\\.|[^\\)])*\)|<<|>>|<[^>]*>|\[|\]|/[^\s/\[\]()<>]+|[^\s/\[\]()<>]+")
+
+
+def explicit_newlines(data):
+    """T*, ' and " rewritten as explicit moves (0 -TL Td); returns (data, count)."""
+    out, stack, tl, nums, n = [], [], 0.0, [], 0
+    for t in PDFTOK.findall(data):
+        if t == b"q":
+            stack.append(tl)
+        elif t == b"Q":
+            tl = stack.pop() if stack else tl
+        elif t == b"TL" and nums:
+            tl = float(nums[-1])
+        elif t == b"TD" and nums:
+            tl = -float(nums[-1])
+        if t == b"T*":
+            out.append(b"0 %g Td" % -tl)
+            n += 1
+        elif t == b"'":  # s '  =  T* s Tj
+            s = out.pop()
+            out += [b"0 %g Td" % -tl, s, b"Tj"]
+            n += 1
+        elif t == b'"':  # aw ac s "  =  aw Tw ac Tc T* s Tj
+            s, ac, aw = out.pop(), out.pop(), out.pop()
+            out += [aw, b"Tw", ac, b"Tc", b"0 %g Td" % -tl, s, b"Tj"]
+            n += 1
+        else:
+            out.append(t)
+        try:
+            float(t)
+            nums.append(t)
+        except ValueError:
+            if t not in (b"[", b"]"):
+                nums = []
+    return b" ".join(out), n
+
+
+def word_layout(page):
+    return [(w[4], round(w[0], 1), round(w[3], 1)) for w in page.get_text("words")]
+
+
+def protect_content(d, page):
+    """MuPDF redactions damage two constructions (Japanese InDesign booklets, Fagioli):
+    - line breaks by T*, ' and " : neighbouring lines move or vanish -> rewritten as explicit 0 -TL Td;
+    - empty clip « 0 0 m W n » hiding a duplicate image : dropped, the hidden image shows up -> rewritten as an
+      empty rectangle « 0 0 0 0 re W n ».
+    The page text must keep the same words at the same places, otherwise the rewrite is undone.
+    Returns (line breaks rewritten, empty clips rewritten, undone)."""
+    page.clean_contents(sanitize=False)  # a single content stream
+    xrefs = page.get_contents()
+    if not xrefs:
+        return 0, 0, False
+    orig = d.xref_stream(xrefs[0])
+    data, n = orig, 0
+    if re.search(rb"T\*|['\"]", data) and not re.search(rb"(?<![^\s])BI(?![^\s])", data):  # no inline image
+        data, n = explicit_newlines(data)
+    data, m = re.subn(rb"(?<=\s)0 0 m\s+W\s+n", b"0 0 0 0 re W n", data)
+    if not (n or m):
+        return 0, 0, False
+    before = word_layout(page)
+    d.update_stream(xrefs[0], data)
+    if word_layout(page) != before:
+        d.update_stream(xrefs[0], orig)
+        return n, m, True
+    return n, m, False
+
+
 src = pymupdf.open(SRC)
 doc = pymupdf.open(SRC)
 log = []
+for _p in doc:
+    _n, _m, _undone = protect_content(doc, _p)
+    if _undone:
+        log.append(f"page {_p.number} : réécriture du flux annulée (le texte bougeait) — redactions non protégées")
+    elif _n or _m:
+        log.append(f"page {_p.number} : flux protégé pour les redactions ({_n} passage(s) à la ligne T* / ' / \", "
+                   f"{_m} masque(s) vide(s))")
 used = set()  # (page, block, line) replaced by a translation
 
 
