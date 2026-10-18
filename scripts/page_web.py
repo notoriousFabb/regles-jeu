@@ -19,7 +19,7 @@ import lxml.html
 LETTRE = re.compile(r"[^\W\d_]")
 NBSP = " "
 PONCTUATION = {"。": ".", "、": ",", "，": ",", "！": "!", "？": "?", "：": ":", "；": ";", "（": "(", "）": ")",
-               "「": "«", "」": "»", "『": "«", "』": "»", "・": "·", "～": "~", "　": " "}
+               "「": "«", "」": "»", "『": "«", "』": "»", "～": "~"}  # ・ et espace idéographique gardés (séparateurs)
 SAUTER = {"script", "style", "noscript", "template", "svg"}
 
 
