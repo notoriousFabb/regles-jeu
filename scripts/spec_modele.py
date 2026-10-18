@@ -4,7 +4,8 @@
 FLOWS : chaque flux = paragraphes posés de haut en bas sur une page, en gardant les écarts d'origine.
   src   : lignes d'origine remplacées, "b12:2-4 b13" = bloc 12 lignes 2 à 4, puis tout le bloc 13 (voir blocks.txt)
   html  : texte français. <b> gras, <i> italique, <br/> retour forcé, {} = icône suivante (ordre de lecture de l'original)
-  options de paragraphe : align="center"|"left" (défaut left), bullet="•"|"1." (puce / numéro, retrait conservé),
+  options de paragraphe : align="center"|"left" (défaut left), bullet="•"|"●"|"❶"|"1." (puce / numéro posé à sa
+          place d'origine, texte après la puce ; ●〇・■◆▶①…⑳❶…❿ reconnus),
           x0 / x1 (limites gauche / droite), size / color / fam / bold / ital (forcer le style), lead (interligne),
           fix=True (garder la ligne de base d'origine : paragraphe qui reprend sous une image), gap (écart en plus),
           wide=False + grow=N (paragraphe centré court : ne pas l'élargir à toute la colonne)
@@ -15,7 +16,11 @@ CARDS / CARD_PAGES / CARD_STYLE (facultatif) : textes imprimés sur les mini-car
 AVANT_TEXTE (facultatif) : fonction (page, pno, log) appelée après l'effacement du texte d'origine et avant
   le français, pour dessiner dessous : redessiner plus large le rectangle arrondi d'un titre devenu trop long
   (même couleur, retrouvé avec page.get_drawings()), recouvrir un drapeau par un autre…
-IGNORE (facultatif) : lignes volontairement non traduites, pour que le rapport « texte non traduit » ne les liste pas."""
+IGNORE (facultatif) : lignes volontairement non traduites, pour que le rapport « texte non traduit » ne les liste pas.
+INCLINEES (facultatif) : étiquettes penchées, [(page, "texte exact de la ligne", "français")] : reposées au même
+  angle, même couleur et même police (references/pieges.md).
+CONTOURS (facultatif) : {page: [(x0, y0, x1, y1)]} titres dont les lettres sont doublées d'un contour en tracés :
+  ces tracés ne sont plus peints (sinon lettres fantômes autour du français)."""
 
 # ---------------------------------------------------------------- réglages du jeu (build.py n'a rien à modifier)
 SRC = r"CHEMIN/VERS/livret_original.pdf"  # A ADAPTER
@@ -37,6 +42,8 @@ SIZE_K = {"Av": 1.0, "H": 1.15}  # facteur de taille par famille (polices.py lar
 # de chaque page (le journal l'indique). Sert aux paragraphes centrés et à la largeur des paragraphes.
 COLUMNS = {}
 IGNORE = {}  # {page: "b0:1 b7"} lignes à ne pas traduire (titre du jeu, calque caché…)
+INCLINEES = []  # [(page, "Connected!", "Reliées !")] étiquettes penchées
+CONTOURS = {}  # {page: [(x0, y0, x1, y1)]} titres aux lettres doublées d'un contour en tracés
 
 FLOWS = []
 

@@ -5,7 +5,7 @@ Moteur générique : tout ce qui est propre à un jeu (PDF source, polices, colo
 (voir spec_modele.py). Usage : python -X utf8 build.py sortie.pdf
 Le journal (police réduite, débordements, icônes, texte non traduit) est affiché et enregistré dans
 <sortie>_journal.txt."""
-import os, re, sys
+import math, os, re, sys
 import pymupdf
 from commun import find_icons
 
@@ -34,10 +34,12 @@ SIZE_K = getattr(spec, "SIZE_K", {})
 COLUMNS = getattr(spec, "COLUMNS", {})
 IGNORE = getattr(spec, "IGNORE", {})
 AVANT_TEXTE = getattr(spec, "AVANT_TEXTE", None)  # f(page, pno, log) : dessin sous le français (bandeau élargi…)
+INCLINEES = getattr(spec, "INCLINEES", [])  # [(page, texte d'origine, français)] : étiquettes penchées
+CONTOURS = getattr(spec, "CONTOURS", {})  # {page: [(x0, y0, x1, y1)]} : lettres doublées d'un contour en tracés
 OUT = sys.argv[1] if len(sys.argv) > 1 else "out_fr.pdf"
 FF = os.path.join(HERE, "ff")
 MARK = "¤"
-BULLET = re.compile(r"^\s*(•|\d+\.)\s*")
+BULLET = re.compile(r"^\s*([•●○〇◆◇■□▪▶►・\u2460-\u2473\u2776-\u277f]|\d+\.)\s*")
 
 # ------------------------------------------------------------------ fonts (from the @font-face rules of spec.CSS)
 FACES = {}
@@ -228,7 +230,12 @@ def content_x0(l):
     m = BULLET.match(t)
     i = m.end() if m else len(t) - len(t.lstrip())
     i = min(i, len(chars) - 1)
-    return chars[i]["bbox"][0]
+    # a full-width bracket after the bullet (「) has its blank on the left: its box starts on the bullet
+    if not m:
+        return chars[i]["bbox"][0]
+    x = max([chars[i]["bbox"][0]] + [c["bbox"][2] for c in chars[m.start(1):i]])
+    glued = not t[m.start(1) + 1:i].strip() and i == m.start(1) + 1  # no blank between bullet and text (❶「…)
+    return x + (0.15 * l["spans"][0]["size"] if glued and t[m.start(1)] not in "0123456789" else 0)
 
 
 def text_spans(l):
@@ -469,12 +476,75 @@ def card_flows():
     return flows
 
 
+def tilted_lines(page, pno):
+    """Lines of the page that are tilted labels of spec.INCLINEES: [(line, French)]."""
+    want = [(en, fr) for p, en, fr in INCLINEES if p == pno]
+    out = []
+    for b in page.get_text("dict")["blocks"] if want else []:
+        for l in b.get("lines", []):
+            t = "".join(s["text"] for s in l["spans"]).strip()
+            fr = next((fr for en, fr in want if en == t), None)
+            if fr is not None and abs(l["dir"][0] - 1) > 0.01:
+                out.append((l, fr))
+    return out
+
+
+def unpaint_outlines(page, pno, log):
+    """spec.CONTOURS: letters drawn a second time as stroked paths (white outline of a title). Each letter path
+    (« q a b c d x y cm … S Q », origin in a zone) is kept but no longer painted (S -> n): a redaction would also
+    remove the shadings and patterns around the title."""
+    zones = [pymupdf.Rect(r) + (-4, -4, 4, 4) for r in CONTOURS.get(pno, [])]
+    if not zones:
+        return
+    H, n = page.rect.height, 0
+
+    def unpaint(m):
+        nonlocal n
+        if any(pymupdf.Point(float(m.group(2)), H - float(m.group(3))) in z for z in zones):
+            n += 1
+            return m.group(1) + b"n Q"
+        return m.group(0)
+    for xref in page.get_contents():
+        data = doc.xref_stream(xref)
+        new = re.sub(rb"(q [-\d.]+ [-\d.]+ [-\d.]+ [-\d.]+ ([-\d.]+) ([-\d.]+) cm [^SsQqBbFfn]*?)[sS] Q", unpaint,
+                     data)
+        if new != data:
+            doc.update_stream(xref, new)
+    log.append(f"page {pno} : {n} contour(s) de lettres effacé(s)" + ("" if n else
+               " — AUCUN : lettres d'un autre type (voir pieges.md, « Lettres doublées d'un contour »)"))
+
+
+def draw_tilted(page, todo, log):
+    """French tilted labels: same angle, colour and size as the original (smaller if more than 20 % longer),
+    centred on the original label."""
+    for l, fr in todo:
+        s = l["spans"][0]
+        c, sn = l["dir"]
+        ff = os.path.join(FF, face_file(*fcode(s)))
+        font = pymupdf.Font(fontfile=ff)
+        size = s["size"]
+        w_en = pymupdf.Rect(l["bbox"]).width / max(abs(c), 0.5)
+        w_fr = font.text_length(fr, size)
+        if w_fr > w_en * 1.2:
+            size *= w_en * 1.2 / w_fr
+            w_fr = font.text_length(fr, size)
+        shift = (w_en - w_fr) / 2
+        o = pymupdf.Point(s["origin"][0] + c * shift, s["origin"][1] + sn * shift)
+        col = s["color"]
+        page.insert_text(o, fr, fontsize=size, fontname="Inc" + re.sub(r"\W", "", os.path.splitext(face_file(*fcode(s)))[0])[:20],
+                         fontfile=ff, color=((col >> 16) / 255, (col >> 8 & 255) / 255, (col & 255) / 255),
+                         morph=(o, pymupdf.Matrix(-math.degrees(math.atan2(sn, c)))))
+        log.append(f"page {page.number} : étiquette inclinée « {fr} » (taille {size:.1f})")
+
+
 # ------------------------------------------------------------------ main
 by_page = {}
 for f in FLOWS + card_flows():
     if not 0 <= f["page"] < len(src):
         fail(f"flux de la page {f['page']} : le livret n'a que {len(src)} pages (numérotées 0 à {len(src) - 1})")
     by_page.setdefault(f["page"], []).append(f)
+for pno in {p for p, en, fr in INCLINEES} | set(CONTOURS):
+    by_page.setdefault(pno, [])
 
 for pno, flows in sorted(by_page.items()):
     page = doc[pno]
@@ -553,8 +623,19 @@ for pno, flows in sorted(by_page.items()):
                               graphics=pymupdf.PDF_REDACT_LINE_ART_REMOVE_IF_COVERED,
                               text=pymupdf.PDF_REDACT_TEXT_NONE)
 
+    tilted = tilted_lines(page, pno)  # spec.INCLINEES
+    for l, fr in tilted:
+        page.add_redact_annot(pymupdf.Rect(l["bbox"]), fill=False)
+    if tilted:
+        page.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE, graphics=pymupdf.PDF_REDACT_LINE_ART_NONE)
+    unpaint_outlines(page, pno, log)
     if AVANT_TEXTE:  # spec hook, drawn after the redactions and under the French text
         AVANT_TEXTE(page, pno, log)
+    draw_tilted(page, tilted, log)
+    found = {fr for l, fr in tilted}
+    for p, en, fr in INCLINEES:
+        if p == pno and fr not in found:
+            log.append(f"page {pno} : étiquette inclinée « {en} » introuvable (texte exact de la ligne attendu)")
 
     # 2. lay out the French text
     to_draw = []
@@ -719,6 +800,8 @@ for pno in range(len(src)):
         for li, l in enumerate(ls):
             t = ltext(l).strip()
             if not t or (pno, bi, li) in used or (bi, li) in skip:
+                continue
+            if abs(l["dir"][0] - 1) > 0.01 and any(p == pno and en == t for p, en, fr in INCLINEES):
                 continue
             if LETTER.search(t):
                 forgot.append(f"  page {pno} b{bi}:{li}  {t[:70]}")

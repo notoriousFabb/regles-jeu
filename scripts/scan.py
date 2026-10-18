@@ -90,10 +90,31 @@ def recouvrir():
             fail(f"{tag} : rectangle vide ou hors de la page {tuple(src[z['page']].rect)}")
         bg = z.get("bg", "auto")
         if bg:  # colours are measured on the untouched page, before any cover is painted
-            covers.append((z["page"], r, ring_color(src[z["page"]], r) if bg == "auto" else hexcol(bg)))
+            covers.append((z["page"], r, ring_color(src[z["page"]], r) if bg == "auto" else hexcol(bg), bg != "auto"))
         if z.get("html") is not None:
             texts.append((tag, z, r))
-    for pno, r, col in covers:
+    if getattr(spec, "VECTEUR", False):
+        # texte dessiné en tracés vectoriels : on supprime les tracés entièrement dans la zone (agrandie de
+        # VECTEUR_MARGE) au lieu de poser un aplat ; le fond d'origine reste intact sous le français
+        # (zone étendue aux petits tracés — lettres — qu'elle touche ; une suppression à la fois : MuPDF
+        # n'efface qu'en partie les tracés couverts par deux zones qui se chevauchent)
+        marge = getattr(spec, "VECTEUR_MARGE", 1.2)
+        lettre = getattr(spec, "VECTEUR_LETTRE", 12)  # taille maximale d'un tracé de lettre, en points
+        for pno, r, col, explicite in covers:
+            page = doc[pno]
+            zone = pymupdf.Rect(r)
+            for dr in page.get_drawings():
+                b = dr["rect"]
+                # lettre à moitié dans la zone au moins (une pièce d'illustration qui l'effleure n'est pas prise)
+                if b.width <= lettre and b.height <= lettre and (b & r).get_area() >= 0.5 * max(b.get_area(), 1e-6):
+                    zone |= b
+            page.add_redact_annot(zone + (-marge, -marge, marge, marge), fill=False)
+            page.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE, text=pymupdf.PDF_REDACT_TEXT_NONE,
+                                  graphics=pymupdf.PDF_REDACT_LINE_ART_REMOVE_IF_COVERED)
+        # couleur de fond donnée dans le spec : aplat posé en plus (un petit cadre plein entièrement dans la
+        # zone, comme l'étiquette « Contact », est supprimé avec les lettres)
+        covers = [c for c in covers if c[3]]
+    for pno, r, col, _ in covers:
         doc[pno].draw_rect(r, color=None, fill=col, overlay=True)
     for tag, z, r in texts:
         page = doc[z["page"]]
@@ -107,7 +128,7 @@ def recouvrir():
         html = f'<div style="{st}">{typo(z["html"])}</div>'
         kmin = z.get("kmin", 0.5)
         spare, scale = page.insert_htmlbox(r + (pad, pad, -pad, -pad), html, css=CSS, archive=ARCH,
-                                           scale_low=kmin)
+                                           scale_low=kmin, rotate=z.get("rot", 0))
         if spare < 0:
             log.append(f"{tag} : DÉBORDE même à {kmin:.2f} × la taille — raccourcir ou agrandir la zone")
         elif scale < 0.999:
