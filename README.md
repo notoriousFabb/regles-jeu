@@ -22,6 +22,7 @@ After You Betobeto-san, The Final Bosses' Blues et Man Eating House (anglais).
 - [Organisation des dossiers](#organisation-des-dossiers)
 - [Déroulement d'une traduction](#déroulement-dune-traduction)
 - [Livrets scannés](#livrets-scannés)
+- [Règles sur une page web](#règles-sur-une-page-web)
 - [Contrôles automatiques et relecture](#contrôles-automatiques-et-relecture)
 - [Coût en jetons et modèles](#coût-en-jetons-et-modèles)
 - [Corriger une traduction déjà faite](#corriger-une-traduction-déjà-faite)
@@ -226,6 +227,16 @@ Détails : `references/scan.md`.
 
 ---
 
+## Règles sur une page web
+Quand les règles ne sont publiées que sur une page web (Google Sites, Notion, site de l'éditeur), le PDF fait
+par la skill [recherche-regles-jeu](https://github.com/vinchy1/recherche-regles-jeu) n'est pas recouvert : la
+page elle-même est traduite (`page_web.py` liste ses morceaux de texte dans l'ordre d'affichage, puis remet le
+français à leur place), et remise en PDF avec le même script (`page_pdf.py --garder` garde la page et ses
+images). Le livret français a exactement la présentation du site, sans police réduite ni texte condensé.
+Le texte dessiné dans les images reste dans la langue d'origine. Détails : `references/page-web.md`.
+
+---
+
 ## Contrôles automatiques et relecture
 **Pendant la construction** (`build.py`, `scan.py`, `controle.py`) :
 - **TEXTE NON TRADUIT** : toute ligne d'origine ni remplacée ni volontairement ignorée (`IGNORE`) est listée.
@@ -286,6 +297,7 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
   - `dossiers.md` : organisation des dossiers, noms de jeux, index et notes ;
   - `langues.md` : langue de départ, livrets multilingues, longueur du français selon la langue, texte vertical ;
   - `scan.md` : livrets scannés (lecture automatique, zones, rendus) ;
+  - `page-web.md` : règles publiées sur une page web (page traduite puis remise en PDF) ;
   - `en-ligne.md` : livret seulement consultable en ligne (Google Drive) : où chercher le PDF, captures de
     l'utilisateur ;
   - `source.md` : vérifier une règle traduite contre l'original (Tokyo Game Market pour les jeux japonais) ;
@@ -305,6 +317,7 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
   - `icone.py` : découpe une icône d'un scan pour la remettre dans le texte français ;
   - `sheet.py` / `side.py` : planche d'aperçu et images côte à côte original / français ;
   - `relecture.py` : relecture du texte seul ;
+  - `page_web.py` : texte d'une page web à traduire, et page française reconstruite ;
   - `livrer.py` : livraison ; `ranger.py` : allègement du dossier d'outils.
 
 ---

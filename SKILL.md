@@ -37,6 +37,9 @@ Scripts : `scripts/` à côté de ce fichier ; `preparer.py` copie ceux qu'il fa
   - **Un livret précis** : ne traduire que celui-là ; les autres restent dans le dossier de dépôt.
 
 ## Méthode
+0. **Règle venue d'une page web** (PDF fait par recherche-regles-jeu depuis une page web ou Notion, d'après
+   `_outils/<Jeu>/NOTES.md`, ou lien donné par l'utilisateur) : ne pas suivre les étapes ci-dessous ;
+   traduire la page elle-même et la remettre en PDF — `references/page-web.md`.
 1. **Préparer** : `python -X utf8 <skill>/scripts/preparer.py "<livret.pdf>" "<Nom du jeu>"`. Il nettoie le
    nom, crée `_outils/<Jeu>/`, détecte texte ou scan, copie scripts et modèle de spec (SRC rempli), fait la
    planche d'aperçu, l'inventaire `blocks.txt`, extrait les polices et signale les accents manquants, devine
