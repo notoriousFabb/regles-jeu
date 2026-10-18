@@ -32,7 +32,8 @@ texte condensé, pas d'image remplacée.
 4. **Construire** : `page_web.py construire web/page_1.html traduction.py` → `web/page_1_fr.html`, puis
    `page_pdf.py "<sortie>_FR.pdf" "file:///<chemin complet>/web/page_1_fr.html"` avec les mêmes options
    qu'à l'étape 1 (sans `--garder`) et `--titre "<Nom du jeu>"`. Même nombre de pages ou presque : le
-   français est plus long, la page s'allonge.
+   français est plus long, la page s'allonge. Adresse `file:///` : encoder `#` (`%23`) et les espaces (`%20`)
+   du chemin, sinon le navigateur coupe l'adresse au `#` (Python : `pathlib.Path(r"…").as_uri()`).
 5. **Texte dans les images** (étiquettes de schémas) : reste dans la langue d'origine (compromis à
    signaler). Le réécrire seulement si l'utilisateur le demande (effacer l'étiquette dans une copie de
    l'image, `web/images/`, et réécrire avec la police du site, comme Cycle Tricks).
