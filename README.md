@@ -220,7 +220,13 @@ Pour le rendu « recouvrir », la skill sait aussi :
   ne les a pas ;
 - découper une icône de l'original (`icone.py`) pour la remettre dans la phrase française ;
 - refaire les titres sur bandeau ou sur pastille, en élargissant le bandeau si le français est plus long ;
-- garder à leur taille les zones d'une seule ligne (interligne et marge resserrés d'office).
+- garder à leur taille les zones d'une seule ligne (interligne et marge resserrés d'office) ;
+- poser une étiquette verticale (`rot`) ;
+- sur un livret dont les lettres sont des tracés vectoriels (ni texte ni image), supprimer les lettres au lieu
+  de poser un aplat (`VECTEUR = True`) : le fond d'origine reste intact sous le français.
+
+Livrets à texte : les puces japonaises (●, 〇, ❶, ①…), les étiquettes penchées (`INCLINEES`) et les titres
+aux lettres doublées d'un contour (`CONTOURS`) sont gérés par `build.py` (voir `references/pieges.md`).
 
 Détails : `references/scan.md`.
 
