@@ -9,6 +9,8 @@ Termes généraux, réutilisables d'un jeu à l'autre. Le vocabulaire propre à 
 | trump broken | atout « ouvert » |
 | the lead (joueur) / lead player / starting player | le meneur (choix de l'utilisateur, pas « entameur ») / premier joueur |
 | lead card | carte d'entame |
+| revoke (défausser alors qu'on pouvait fournir) | renonce |
+| Misère (aucun pli remporté) | Misère (gardé) |
 | round / game | manche / partie |
 | hand / deal / deck | main / distribuer / paquet |
 | draw pile / draw display / discard | pioche / rivière / défausse |
@@ -43,6 +45,12 @@ Termes généraux, réutilisables d'un jeu à l'autre. Le vocabulaire propre à 
 | Team cards (Pack Tricks) | cartes Équipe |
 | Trump Suit Indicator | indicateur d'atout |
 | Starting / Initial Lead Player | premier meneur |
+| dealer | donneur |
+| summary card | carte Résumé |
+| NPC (joueur virtuel) | PNJ |
+| tap / untap (pivoter une carte) | engager / dégager |
+| Upgrade (effet renforcé) | Amélioration |
+| Must-Not-Follow | interdit de suivre |
 
 ## Équivalences dans d'autres langues
 Termes de base des jeux de plis ; renvoient au français du tableau ci-dessus. Compléter à chaque jeu.

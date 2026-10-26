@@ -223,6 +223,27 @@ def dedupe(lines):
     return out
 
 
+def ink_rect(l):
+    """Box of the line's printed characters: leading / trailing blanks (full-width spaces used as indents) left
+    out, so the redaction does not erase what they overlap (numbers on a card picture beside the text)."""
+    boxes = []
+    for s in l["spans"]:
+        for c in s["chars"]:
+            if c["c"].strip():
+                r = pymupdf.Rect(c["bbox"])
+                if c["c"] in "）」』】〕":  # full-width closing bracket: ink on the left half, the right half is blank
+                    r.x1 = r.x0 + r.width / 2
+                elif c["c"] in "（「『【〔":
+                    r.x0 = r.x1 - r.width / 2
+                boxes.append(r)
+    if not boxes:
+        return pymupdf.Rect(l["bbox"])
+    r = pymupdf.Rect(boxes[0])
+    for b in boxes[1:]:
+        r |= b
+    return pymupdf.Rect(r.x0, l["bbox"][1], r.x1, l["bbox"][3])
+
+
 def content_x0(l):
     """x of the first character after an optional bullet / number and blanks."""
     chars = [c for s in l["spans"] for c in s["chars"]]
@@ -567,7 +588,7 @@ for pno, flows in sorted(by_page.items()):
         paras = []
         for p in fl["paras"]:
             raw = sel_lines(lines_of, p["src"], pno)
-            allrects = [pymupdf.Rect(l["bbox"]) for l in raw]
+            allrects = [ink_rect(l) for l in raw]
             lines = [l for l in dedupe(raw) if text_spans(l)]
             if not lines:
                 log.append(f"page {pno} {p['src']} : aucune ligne de texte")

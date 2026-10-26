@@ -2,6 +2,12 @@
 
 `preparer.py` le détecte (« SCANNÉ ») et copie `scan.py`, `ocr.py`, `grille.py`, `bandes.py` et le modèle
 `spec_scan_modele.py`. Il n'y a pas de texte à remplacer : `build.py` ne s'applique pas.
+Sont aussi traités comme des scans : une page-image avec une **couche de texte OCR invisible** (police
+« HiddenHorzOCR », Helvetica non embarquée, mode de rendu 3 : le texte se sélectionne mais l'image reste
+affichée — Quino-Phex) et des **lettres en tracés vectoriels** (« texte en tracés vectoriels », `VECTEUR = True`
+posé dans le spec — Koi Breeders, Tricks of the Engkantos). Si un tel livret a été préparé comme livret à
+texte (ancienne version de `preparer.py`) : copier les scripts de scan et `spec_scan_modele.py` à la main et
+retirer `build.py` (sinon `livrer.py` le prend pour moteur).
 
 ## Choisir le rendu (demander à l'utilisateur)
 - **« recouvrir »** (ressemble à l'original) : chaque zone de texte de l'image est masquée par la couleur du fond
@@ -18,7 +24,8 @@
 1. **Lecture automatique** : `preparer.py` lance `ocr.py` (reconnaissance de texte de Windows), qui écrit
    `zones.py` : un `Z(page, (x0, y0, x1, y1), "texte d'origine")` par paragraphe, la taille du texte et, en
    commentaire, le haut et le bas de chaque ligne. Langue de lecture : choisie seule (japonais si Windows sait
-   le lire et que le livret en contient, sinon anglais) ; autre langue : `--langue-ocr de-DE`, `fr-FR`… ;
+   le lire et que le livret en contient, sinon anglais, et à défaut une autre langue à alphabet latin
+   installée, par ex. `fr-FR` : elle lit bien l'anglais, à quelques confusions l/I près) ; autre langue : `--langue-ocr de-DE`, `fr-FR`… ;
    `python -X utf8 ocr.py --langues` liste celles installées. Japonais, chinois… : module OCR de Windows à
    installer par l'utilisateur (terminal administrateur :
    `dism /Online /Add-Capability /CapabilityName:Language.OCR~~~ja-JP~0.0.1.0`) ; sinon, méthode manuelle

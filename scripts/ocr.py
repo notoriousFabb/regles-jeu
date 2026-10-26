@@ -98,6 +98,16 @@ def main():
     lang = sys.argv[2] if len(sys.argv) > 2 else "en-US"
     out = sys.argv[3] if len(sys.argv) > 3 else "zones.py"
     engine = OcrEngine.try_create_from_language(Language(lang))
+    if engine is None and lang.split("-")[0].lower() not in ("ja", "zh", "ko"):
+        # langue absente de Windows : une autre langue à alphabet latin lit aussi le texte (anglais lu en
+        # français : quelques confusions l/I, accents parasites, à corriger dans les en= du spec)
+        tags = [l.language_tag for l in OcrEngine.available_recognizer_languages]
+        repli = [t for t in tags if t.startswith("en")] + \
+                [t for t in tags if t.split("-")[0].lower() in ("fr", "de", "es", "it", "pt", "nl")]
+        if repli:
+            print(f"Langue OCR « {lang} » non installée : lecture avec « {repli[0]} » à la place")
+            lang = repli[0]
+            engine = OcrEngine.try_create_from_language(Language(lang))
     if engine is None:
         sys.exit(f"ERREUR : langue OCR « {lang} » non installée dans Windows (installées : "
                  f"{[l.language_tag for l in OcrEngine.available_recognizer_languages]})")
