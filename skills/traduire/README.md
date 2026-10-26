@@ -1,4 +1,4 @@
-# traduction-regles-jeu — skill Claude Code
+# traduire — skill du plugin regles-jeu
 
 Traduit en français un livret de règles de jeu de société au format PDF, depuis **n'importe quelle langue**
 (anglais, allemand, espagnol, italien, japonais…), **en gardant exactement la mise en page** : polices,
@@ -67,8 +67,8 @@ Préférences de traduction appliquées :
 ---
 
 ## Installation
-1. **Copier la skill** : le dossier `traduction-regles-jeu` dans `~/.claude/skills/`
-   (Windows : `C:\Users\<vous>\.claude\skills\`).
+1. **Installer le plugin** `regles-jeu`, qui contient cette skill, la skill de traduction et les
+   agents relecteurs : voir le [README du plugin](../../README.md#installation).
 2. **Installer Python 3 et les bibliothèques** :
    ```
    pip install pymupdf fonttools pyspellchecker
@@ -86,10 +86,9 @@ Préférences de traduction appliquées :
      dism /Online /Add-Capability /CapabilityName:Language.OCR~~~ja-JP~0.0.1.0
      ```
      (`Add-WindowsCapability` échoue sous PowerShell 7 avec « Classe non enregistrée »).
-3. **Installer les agents relecteurs** (facultatif mais conseillé) : copier les fichiers de `agents/` dans
-   `~/.claude/agents/`, puis redémarrer Claude Code. La relecture est alors faite sur un modèle moins coûteux
-   (voir [Coût en jetons et modèles](#coût-en-jetons-et-modèles)). Sans eux, la skill lance un agent ordinaire
-   sur le même modèle moins coûteux : le résultat est le même, seule la configuration change.
+3. **Agents relecteurs** : installés avec le plugin (`regles-jeu:relecteur-texte` et
+   `regles-jeu:relecteur-visuel`). La relecture est faite sur un modèle moins coûteux (voir
+   [Coût en jetons et modèles](#coût-en-jetons-et-modèles)).
 4. **Créer le dossier de dépôt** `A traduire` dans votre ludothèque.
 
 Facultatif : un `CLAUDE.md` à la racine de la ludothèque peut noter le chemin exact de Python ou un autre nom
@@ -240,7 +239,7 @@ Détails : `references/scan.md`.
 
 ## Règles sur une page web
 Quand les règles ne sont publiées que sur une page web (Google Sites, Notion, site de l'éditeur), le PDF fait
-par la skill [recherche-regles-jeu](https://github.com/vinchy1/recherche-regles-jeu) n'est pas recouvert : la
+par la skill [rechercher](../rechercher/README.md) n'est pas recouvert : la
 page elle-même est traduite (`page_web.py` liste ses morceaux de texte dans l'ordre d'affichage, puis remet le
 français à leur place), et remise en PDF avec le même script (`page_pdf.py --garder` garde la page et ses
 images). Le livret français a exactement la présentation du site, sans police réduite ni texte condensé.
@@ -304,7 +303,8 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
 
 ## Contenu du dépôt
 - `SKILL.md` — la méthode suivie par Claude et les préférences de traduction
-- `agents/` — `relecteur-texte.md` et `relecteur-visuel.md` (Sonnet), à copier dans `~/.claude/agents/`
+- `../../agents/` (à la racine du plugin) — `relecteur-texte.md` et `relecteur-visuel.md` (Sonnet), installés avec
+  le plugin
 - `references/`
   - `dossiers.md` : organisation des dossiers, noms de jeux, index et notes ;
   - `langues.md` : langue de départ, livrets multilingues, longueur du français selon la langue, texte vertical ;

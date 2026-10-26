@@ -1,7 +1,7 @@
 # Règle venue d'une page web
 
 Cas : il n'y a pas de livret PDF de l'éditeur, les règles sont sur une page web (Google Sites, Notion, site de
-l'éditeur), et le PDF du dossier de dépôt a été fait par la skill recherche-regles-jeu (`page_pdf.py`, ou
+l'éditeur), et le PDF du dossier de dépôt a été fait par la skill rechercher (`page_pdf.py`, ou
 `notion_html.py` pour Notion). `NOTES.md` du jeu le dit (« page web mise en PDF », lien de la page) ; sinon
 l'utilisateur donne directement le lien.
 
@@ -14,7 +14,7 @@ texte condensé, pas d'image remplacée.
 ## Étapes
 1. **Préparer le dossier** `_outils/<Jeu>/` (sans `preparer.py`, qui ne sert qu'au recouvrement) et y garder
    la page :
-   - page ordinaire : relancer `page_pdf.py` de recherche-regles-jeu avec **les mêmes options que pour le PDF
+   - page ordinaire : relancer `page_pdf.py` de la skill rechercher avec **les mêmes options que pour le PDF
      d'origine** (`--fidele` ou `--xpath "…"`, même `--largeur`) et `--garder "_outils/<Jeu>/web"` ; sortie dans
      le scratchpad (on garde le PDF du dossier de dépôt comme original). Depuis PowerShell (Git Bash abîme
      les arguments qui commencent par `//`).

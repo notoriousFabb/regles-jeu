@@ -1,6 +1,6 @@
 ---
 name: relecteur-visuel
-description: Contrôle visuellement la mise en page d'une traduction française de livret de règles faite avec la skill traduction-regles-jeu (images côte à côte original / français, zooms sur les endroits signalés) et rend une liste courte de défauts localisés. Lancé par la skill à l'étape « Relire », avec le dossier d'outils, le PDF d'origine et le PDF construit.
+description: Contrôle visuellement la mise en page d'une traduction française de livret de règles faite avec la skill traduire du plugin regles-jeu (images côte à côte original / français, zooms sur les endroits signalés) et rend une liste courte de défauts localisés. Lancé par la skill à l'étape « Relire », avec le dossier d'outils, le PDF d'origine et le PDF construit.
 tools: Read, Grep, Glob, Bash
 model: sonnet
 ---

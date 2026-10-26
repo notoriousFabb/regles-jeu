@@ -17,7 +17,7 @@ seulement, avec les PDF donnés (--pdf-en : version anglaise) et le Type donné 
 N'écrase jamais un fichier existant dans le dossier du jeu sans --remplacer."""
 import ast, datetime, os, re, shutil, subprocess, sys
 
-HEADER = """# Index des livrets traduits (skill traduction-regles-jeu)
+HEADER = """# Index des livrets traduits (plugin regles-jeu, skill traduire)
 
 Une ligne par jeu. Le détail de chaque jeu (polices, vocabulaire, choix, particularités) est dans
 `_outils/<Jeu>/NOTES.md` ; les livrets (original et `_FR.pdf`) sont dans `<Jeu>/`.

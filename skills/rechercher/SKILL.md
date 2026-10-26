@@ -1,6 +1,6 @@
 ---
-name: recherche-regles-jeu
-description: Cherche sur internet le livret de règles d'un jeu (Tokyo Game Market, BoardGameGeek, site de l'éditeur), l'enregistre sur le PC en PDF intégral, puis propose de le traduire avec traduction-regles-jeu. À utiliser dès que l'utilisateur demande de trouver, télécharger ou récupérer les règles, le livret, le manuel ou le rulebook d'un jeu, même avec son seul nom.
+name: rechercher
+description: Cherche sur internet le livret de règles d'un jeu (Tokyo Game Market, BoardGameGeek, site de l'éditeur), l'enregistre sur le PC en PDF intégral, puis propose de le traduire avec la skill traduire du même plugin. À utiliser dès que l'utilisateur demande de trouver, télécharger ou récupérer les règles, le livret, le manuel ou le rulebook d'un jeu, même avec son seul nom.
 ---
 
 # Recherche d'un livret de règles → PDF intégral sur le PC
@@ -81,7 +81,7 @@ Liens tels quels, lignes vides omises :
 ```
 # <Jeu>
 
-## Sources (recherche-regles-jeu, <date du jour>)
+## Sources (regles-jeu:rechercher, <date du jour>)
 - Jeu : <titre d'origine> (<lecture>), <auteur>, <éditeur / cercle>, <sortie>
 - Fiche Game Market : <lien>  ·  BGG : <lien>  ·  Éditeur : <lien>
 - Livret enregistré : <fichier> (nom d'origine : <si renommé>) — <langue>, officiel / fan — <lien>
@@ -94,7 +94,7 @@ Liens tels quels, lignes vides omises :
 1. Dire : **chemin complet du fichier**, source et lien, langue, pages, forme d'origine, réserves, chemin de NOTES.md.
 2. AskUserQuestion : « Voulez-vous que je lance maintenant la traduction de ce livret ? » — « Oui, en français » /
    « En français et en anglais » (livret ni français ni anglais) / « Non ».
-3. Oui : outil Skill `traduction-regles-jeu`, `args` : chemin du PDF, nom `<Jeu>`, « liens de la recherche dans
+3. Oui : outil Skill `regles-jeu:traduire`, `args` : chemin du PDF, nom `<Jeu>`, « liens de la recherche dans
    _outils/<Jeu>/NOTES.md » et, si demandé, « version anglaise aussi ». Non : s'arrêter.
 
 Terminé quand le PDF complet est enregistré, que l'utilisateur connaît son chemin, et que la traduction lui a

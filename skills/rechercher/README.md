@@ -1,9 +1,9 @@
-# recherche-regles-jeu — skill Claude Code
+# rechercher — skill du plugin regles-jeu
 
 Trouve sur internet le **livret de règles d'un jeu** dont on donne simplement le nom, et l'enregistre sur le PC
 en **PDF intégral** : le PDF de l'éditeur tel quel, ou les règles affichées sur des pages web mises en PDF sans
 rien couper. Elle propose ensuite de le traduire en français avec la skill
-[traduction-regles-jeu](https://github.com/vinchy1/traduction-regles-jeu).
+[traduire](../traduire/README.md).
 
 Il suffit de demander à Claude Code « trouve-moi les règles de Hyakuju Parade ». La skill cherche, vous montre
 ce qu'elle a trouvé, télécharge la version choisie, la range dans le dossier de dépôt et garde les liens.
@@ -45,22 +45,17 @@ société, de cartes ou autre.
 ---
 
 ## Installation
-1. **Copier la skill** : le dossier `recherche-regles-jeu` dans `~/.claude/skills/`
-   (Windows : `C:\Users\<vous>\.claude\skills\`), par exemple :
-   ```
-   git clone https://github.com/vinchy1/recherche-regles-jeu.git ~/.claude/skills/recherche-regles-jeu
-   ```
+1. **Installer le plugin** `regles-jeu`, qui contient cette skill, la skill de traduction et les
+   agents relecteurs : voir le [README du plugin](../../README.md#installation).
 2. **Python 3 et deux bibliothèques** (vérification des PDF, mise en PDF des pages web) :
    ```
    pip install pymupdf lxml
    ```
 3. **Google Chrome ou Microsoft Edge** installé : il sert, en arrière-plan et avec un profil temporaire, à mettre
    les pages web en PDF. Votre navigateur habituel, vos onglets et vos connexions ne sont pas touchés.
-4. **Facultatif mais conseillé** :
-   - la skill [traduction-regles-jeu](https://github.com/vinchy1/traduction-regles-jeu), pour enchaîner sur la
-     traduction ;
-   - l'extension **Claude in Chrome** : elle permet de lire les pages de BoardGameGeek (qui refusent la lecture
-     simple) et de télécharger un fichier qui demande d'être connecté, avec votre propre session.
+4. **Facultatif mais conseillé** : l'extension **Claude in Chrome** : elle permet de lire les pages de
+   BoardGameGeek (qui refusent la lecture simple) et de télécharger un fichier qui demande d'être connecté,
+   avec votre propre session.
 5. **Dossier de dépôt** : celui de la skill de traduction, `A traduire` dans votre ludothèque. Notez son chemin
    dans un `CLAUDE.md` à la racine de la ludothèque (par exemple « les PDF à traduire sont déposés dans
    `A traduire/` »). S'il n'est noté nulle part, Claude le demande la première fois et propose de le noter.
@@ -69,24 +64,8 @@ société, de cartes ou autre.
 ---
 
 ## Mise à jour
-Si la skill a été installée avec `git clone` (étape 1 ci-dessus), récupérer la dernière version :
-```
-git -C ~/.claude/skills/recherche-regles-jeu pull --ff-only
-```
-(Windows, dans PowerShell : `git -C "$env:USERPROFILE\.claude\skills\recherche-regles-jeu" pull --ff-only`.)
-
-On peut aussi simplement demander à Claude Code « mets à jour la skill recherche-regles-jeu ».
-
-- Si la commande refuse parce que des fichiers de la skill ont été modifiés sur le PC, `git status` les liste :
-  les garder de côté (`git stash`), refaire le `pull`, puis les remettre (`git stash pop`) ou les abandonner.
-- Si la skill a été copiée sans git, remplacer le dossier par la nouvelle version (ou le supprimer et refaire
-  le `git clone` de l'installation).
-- Relancer `pip install pymupdf lxml` si une nouvelle version demande d'autres bibliothèques (indiqué dans
-  [Installation](#installation)).
-- Dans une session Claude Code déjà ouverte, taper `/reload-skills` pour prendre en compte la nouvelle version
-  (ou ouvrir une nouvelle session).
-- Penser à mettre à jour aussi la skill [traduction-regles-jeu](https://github.com/vinchy1/traduction-regles-jeu)
-  de la même façon, les deux partageant la note du jeu.
+Voir le [README du plugin](../../README.md#mise-à-jour) : les deux skills se mettent à jour ensemble.
+Relancer `pip install pymupdf lxml` si une nouvelle version demande d'autres bibliothèques.
 
 ---
 
@@ -98,7 +77,7 @@ Ouvrir Claude Code dans la ludothèque (ou son dossier `A traduire`) et demander
 ou, avec la commande directe :
 
 ```
-/recherche-regles-jeu Cat in the Box
+/regles-jeu:rechercher Cat in the Box
 ```
 
 Donnez le nom **tel que vous le connaissez** (titre anglais, romanisation, titre japonais) : la skill ne devine
@@ -107,7 +86,7 @@ fiches trouvées. Si plusieurs jeux différents portent ce nom, elle demande leq
 
 Exemple réel (octobre 2026) :
 
-> **Vous** : /recherche-regles-jeu Hyakuju Parade
+> **Vous** : /regles-jeu:rechercher Hyakuju Parade
 > **Claude** : J'ai trouvé deux versions officielles (fiche Game Market de ヒャクジュウパレード, Bamboo Games) :
 > anglais et japonais, toutes deux en PDF sur le Google Drive de l'éditeur. Laquelle voulez-vous ?
 > **Vous** : Anglais
@@ -118,7 +97,7 @@ Exemple réel (octobre 2026) :
 **Plusieurs jeux d'un coup** : donnez une liste.
 
 ```
-/recherche-regles-jeu Bird Club, Break The Heart, Kubaru Te Miru Me
+/regles-jeu:rechercher Bird Club, Break The Heart, Kubaru Te Miru Me
 ```
 
 La skill cherche chaque jeu, vous pose **en une seule fois** les questions de choix de version (une par jeu),
@@ -260,7 +239,7 @@ traduction, dans une section « Sources » :
 ```
 # Hyakuju Parade
 
-## Sources (recherche-regles-jeu, 2026-10-17)
+## Sources (regles-jeu:rechercher, 2026-10-17)
 - Jeu : ヒャクジュウパレード (Hyakuju Parade), カサギケイタ, バンブーゲームズ (Bamboo Games), Game Market 2026 automne
 - Fiche Game Market : https://gamemarket.jp/game/188738
 - Livret enregistré : HYAKUJU_PARADE_English_Rulebook.pdf — anglais, officiel — <lien>
@@ -274,17 +253,17 @@ tout de suite, la traduction faite plus tard retrouve ces liens sans refaire la 
 
 ## Enchaîner avec la traduction
 À la fin, Claude demande : « Voulez-vous que je lance maintenant la traduction de ce livret en français ? »
-- **Oui** : la skill `traduction-regles-jeu` démarre avec le chemin du PDF, le nom du jeu et la note des liens.
+- **Oui** : la skill `traduire` démarre avec le chemin du PDF, le nom du jeu et la note des liens.
 - **Non** : le PDF reste prêt dans `A traduire/` ; il suffira plus tard de demander « traduis Hyakuju Parade ».
 
-Pour que la traduction relise la note des liens, utilisez une version de `traduction-regles-jeu` qui connaît la
+Pour que la traduction relise la note des liens, utilisez une version de la skill `traduire` qui connaît la
 section « Sources » de `NOTES.md` (sinon elle refait simplement la recherche des sources).
 
 ---
 
 ## Contenu du dépôt
 ```
-recherche-regles-jeu/
+skills/rechercher/
 ├── SKILL.md            instructions suivies par Claude (le déroulement courant)
 ├── README.md           ce fichier
 ├── references/         instructions lues seulement dans le cas concerné
@@ -327,5 +306,5 @@ sont lues en texte plutôt qu'en captures d'écran, pour la même raison.
 ## Remarques
 - **Usage personnel** : les livrets restent la propriété de leurs éditeurs ; ne les rediffusez qu'avec leur
   accord.
-- Compagnon de [traduction-regles-jeu](https://github.com/vinchy1/traduction-regles-jeu), par
+- Compagnon de la skill [traduire](../traduire/README.md), par
   [vinchy1](https://github.com/vinchy1).

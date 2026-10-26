@@ -1,5 +1,5 @@
 ---
-name: traduction-regles-jeu
+name: traduire
 description: Traduit en français (et en anglais si demandé) un livret de règles de jeu de société en PDF, depuis n'importe quelle langue, en conservant la mise en page — polices, images, icônes, tableaux, positions — et produit un `*_FR.pdf` ; gère aussi les livrets scannés. À utiliser dès que l'utilisateur demande de traduire des règles, un livret, un rulebook ou un PDF de jeu (même « traduis-moi ce PDF » ou un nom comme `xxx_rulebook.pdf`, `Spielregel.pdf`), ou de corriger une traduction déjà faite ainsi.
 ---
 
@@ -30,14 +30,14 @@ réponse. Tout : un livret à la fois, sans parallélisme (index commun), court 
 un livret à problème est mis de côté et signalé.
 
 ## Méthode
-0. **Règle venue d'une page web** (PDF fait par recherche-regles-jeu depuis une page web ou Notion, d'après
+0. **Règle venue d'une page web** (PDF fait par la skill rechercher depuis une page web ou Notion, d'après
    `_outils/<Jeu>/NOTES.md`, ou lien donné par l'utilisateur) : ne pas suivre les étapes ci-dessous ;
    traduire la page elle-même et la remettre en PDF — `references/page-web.md`.
 1. **Préparer** : `python -X utf8 <skill>/scripts/preparer.py "<livret.pdf>" "<Nom du jeu>"` (nom, dossier
    d'outils, texte ou scan, scripts et modèle de spec, planche, `blocks.txt`, polices, langue —
    `references/langues.md` —, OCR des scans → `zones.py`, jeux traduits aux mêmes polices). Regarder la planche,
    annoncer langue, pages, type. Nom en écriture non latine : `--nom-fichier` (`references/dossiers.md`).
-   - `NOTES.md` déjà présente (recherche-regles-jeu) : réutiliser ses liens.
+   - `NOTES.md` déjà présente (skill rechercher) : réutiliser ses liens.
    - **Jeu japonais** : fiche Tokyo Game Market et manuel de l'auteur avant le spec ; règle traduite ou de fan :
      comparer à l'original — `references/source.md`.
    - **Scan** : demander le rendu (recouvrir / côte à côte / recomposer) → `references/scan.md`.
@@ -55,8 +55,8 @@ un livret à problème est mis de côté et signalé.
 5. **Relire** — deux agents lancés **en parallèle** (un message, deux appels Agent). Messages **courts** : les
    agents ont leur méthode ; donner seulement les chemins, le vocabulaire choisi en une ligne, les endroits à
    regarder et les particularités (spec bilingue, scan, rendu recomposé) :
-   - `relecteur-texte` : dossier d'outils + dossier de la skill ;
-   - `relecteur-visuel` : dossier d'outils, PDF d'origine, PDF construit(s), journal, endroits prioritaires.
+   - `regles-jeu:relecteur-texte` : dossier d'outils + dossier de la skill ;
+   - `regles-jeu:relecteur-visuel` : dossier d'outils, PDF d'origine, PDF construit(s), journal, endroits prioritaires.
    Agents non installés : `general-purpose`, `model: "sonnet"`, message = contenu de `agents/relecteur-….md`
    (sans l'en-tête) + chemins. Rapports = propositions : vérifier chaque point avant de corriger ; petite
    correction → regarder soi-même la seule zone modifiée, sans relancer les agents.

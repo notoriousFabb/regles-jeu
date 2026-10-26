@@ -12,13 +12,15 @@ Signale (affiché et dans relecture.txt) :
 Livret scanné : l'original vient de Z(..., en="texte d'origine") s'il est donné (texte de zones.py).
 Spec bilingue (X("fr", "en")) : `LANGUE=en python -X utf8 relecture.py` relit la version anglaise et écrit
 texte_en.txt (orthographe anglaise ; contrôles propres au français et au glossaire laissés de côté)."""
-import html as htmlmod, os, re, runpy, sys
+import glob, html as htmlmod, os, re, runpy, sys
 import pymupdf
 
 HERE = os.getcwd()
 LANG = os.environ.get("LANGUE", "fr")
 SKILL_REFS = [os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "references"),
-              os.path.expanduser("~/.claude/skills/traduction-regles-jeu/references")]
+              os.path.expanduser("~/.claude/skills/regles-jeu/skills/traduire/references")]
+SKILL_REFS += sorted(glob.glob(os.path.expanduser(  # plugin installé depuis GitHub
+    "~/.claude/plugins/cache/*/regles-jeu/*/skills/traduire/references")), reverse=True)
 EN_COMMON = {"the", "and", "with", "your", "you", "player", "players", "card", "cards", "trick", "tricks", "round",
              "turn", "each", "must", "may", "this", "that", "from", "into", "when", "then", "their", "they", "have"}
 AMBIGUOUS = {"game", "games", "score", "scores", "hand", "suit", "deck", "deal", "round", "rank", "set", "run",

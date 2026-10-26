@@ -12,7 +12,7 @@
 
 ## « REFUSÉ » ou « PAS UN PDF »
 Connexion demandée : télécharger avec Chrome, sinon demander à l'utilisateur de le faire et de dire où il l'a mis.
-Google Drive toujours bloqué : suivre `references/en-ligne.md` de traduction-regles-jeu (avec son accord).
+Google Drive toujours bloqué : suivre `references/en-ligne.md` de la skill traduire (avec son accord).
 Le fichier n'est jamais modifié.
 
 ## Fichier sur le Drive de l'utilisateur (son propre scan, lien privé)

@@ -1,6 +1,6 @@
 ---
 name: relecteur-texte
-description: Relit le texte d'une traduction française de livret de règles faite avec la skill traduction-regles-jeu (texte seul, sans images) et rend une liste courte de problèmes avec corrections proposées. Lancé par la skill à l'étape « Relire », avec le dossier d'outils du jeu.
+description: Relit le texte d'une traduction française de livret de règles faite avec la skill traduire du plugin regles-jeu (texte seul, sans images) et rend une liste courte de problèmes avec corrections proposées. Lancé par la skill à l'étape « Relire », avec le dossier d'outils du jeu.
 tools: Read, Grep, Glob, Bash
 model: sonnet
 ---
