@@ -356,3 +356,5 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
 - Skill initiée par [notoriousFabb](https://github.com/notoriousFabb/traduction-regles-jeu), optimisée et complétée par
   [vinchy1](https://github.com/vinchy1/traduction-regles-jeu) ; cette version par vinchy1 y ajoute la traduction depuis
   toutes les langues, les livrets scannés, l'organisation en dossiers, les contrôles automatiques, la relecture du texte et les agents relecteurs.
+- Ce dépôt évolue désormais de façon indépendante. Le dépôt d'origine reste noté comme source facultative
+  (`git fetch notoriousfabb`) : ses nouveautés ne sont reprises qu'à la demande.
