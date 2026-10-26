@@ -65,6 +65,11 @@ La plupart sont déjà gérés par `scripts/build.py` ; ce qui reste à faire da
   `0 -TL Td` et en `0 0 0 0 re W n`, annulée si le texte de la page bouge (journal : « flux protégé… » ou
   « réécriture du flux annulée »). Si l'anglais revient malgré tout : vérifier `page.search_for()` avant et
   après une redaction isolée sur une seule ligne.
+- **Retraits en espaces pleine chasse** (livrets japonais : « 　　　Texte » à côté d'une mini-carte dessinée,
+  Bell Peppers) : la ligne commence sous la carte, et l'effacer sur toute sa largeur emportait les chiffres
+  et lettres de la carte. `build.py` n'efface que les caractères imprimés de la ligne (`ink_rect` : sans les
+  blancs de tête et de fin, demi-largeur pour les parenthèses pleine chasse （）「」). Le texte français, lui,
+  se place avec `x0` = début de ligne + n × la taille de police (une espace pleine chasse = 1 em).
 - **Marges de paragraphe ignorées** (livret composé avec `pymupdf.Story`) : MuPDF donne à `<p>` une marge
   par défaut de 1em en haut et en bas, que `* {margin:0}` ne remet pas à zéro. Une règle qui ne fixe qu'un
   côté (`p {margin-bottom:6pt}`) laisse l'autre à 1em, qui l'emporte (marges fusionnées) : l'écart reste

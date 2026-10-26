@@ -9,6 +9,8 @@ Termes généraux, réutilisables d'un jeu à l'autre. Le vocabulaire propre à 
 | trump broken | atout « ouvert » |
 | the lead (joueur) / lead player / starting player | le meneur (choix de l'utilisateur, pas « entameur ») / premier joueur |
 | lead card | carte d'entame |
+| revoke (défausser alors qu'on pouvait fournir) | renonce |
+| Misère (aucun pli remporté) | Misère (gardé) |
 | round / game | manche / partie |
 | hand / deal / deck | main / distribuer / paquet |
 | draw pile / draw display / discard | pioche / rivière / défausse |
