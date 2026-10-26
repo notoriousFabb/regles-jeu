@@ -51,6 +51,11 @@ de l'espace : au-delà de ~0,3 em le texte paraît justifié
 | symboles ①…⑳, ❶…❿, ◆, ★, ■ absents (ou minuscules) dans la police du texte | Segoe UI Symbol (`seguisym.ttf`), en `<span>` | Windows |
 | linéale humaniste d'un scan anglais | Alegreya Sans | Google Fonts |
 | titres rétro sur bandeau | Righteous | Google Fonts |
+| Gotham Book / Medium (tracés vectoriels) | Montserrat 400 / 500 (instancer) | ×0,98 en largeur |
+| géométrique à « a » simple (titres et texte d'un scan) | Outfit 400 / 600 (instancer) | Google Fonts |
+| Myriad (scan) | Source Sans 3 400 / 600 (instancer) | Google Fonts |
+| serif évasé type Trajan minuscule | Marcellus (pas de gras : Spectral SemiBold pour `<b>`) | Google Fonts |
+| Arial Narrow / Palatino d'un scan | ARIALN*.TTF, pala*.ttf de Windows | corriger U+00A0 d'ARIALNB (pieges.md) |
 
 Ces polices sont déjà dans le dossier `ff/` des jeux traduits (voir la colonne Polices de l'index `LISEZMOI.md`) : les
 copier plutôt que retélécharger.

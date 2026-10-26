@@ -71,5 +71,18 @@ La plupart sont déjà gérés par `scripts/build.py` ; ce qui reste à faire da
   d'une ligne entière, sans message. Toujours donner les quatre côtés dans la règle du paragraphe ou de sa
   classe : `p {margin: 0 0 6pt 0;}`, `.memo {margin: 0 0 3pt 0;}`. Symptôme : listes ou paragraphes
   anormalement espacés, page qui déborde alors qu'elle devrait tenir. `margin-left` seul fonctionne.
+- **Titres, bulles et légendes en caractères-images** (PDF « Microsoft Print to PDF » d'un fichier Illustrator :
+  chaque kanji d'un titre est une petite image, les renvois « p8 » ou « 〜 » de petits dessins ; rien dans
+  `blocks.txt`) : couche « scan » dans `AVANT_TEXTE` du spec — liste de rectangles, aplat de la couleur
+  mesurée autour (médiane d'un anneau de 1,5 pt sur la page déjà nettoyée) ou donnée, puis `insert_htmlbox`
+  du français (poser soi-même les insécables ; `html=None` = simple masque ; police : `pymupdf.Archive("ff")`
+  et le `CSS` du spec). Cellules de tableau dont la redaction mangerait les chiffres voisins : `IGNORE` +
+  recouvrement dans la même couche. Noter dans `NOTES.md` du jeu que cette couche existe.
+- **Police sans gras** (Marcellus…) : MuPDF ne fabrique pas de faux gras, `<b>` sort en maigre. Déclarer une
+  police grasse voisine dans la même famille (`@font-face{font-family:Mc;font-weight:bold;src:url(...)}`).
+- **Espace insécable trop large** : Arial Narrow Bold de Windows (ARIALNB.TTF) dessine U+00A0 deux fois plus
+  large que l'espace (trous dans « « cartes » », « Obligation de suivre : »). Corriger la copie de `ff/` avec
+  fontTools : U+00A0 → glyphe de l'espace dans toutes les tables `cmap`. Contrôle : `hmtx` de U+00A0 = celui
+  de U+0020.
 - **Modifier spec/build par script** : écrire le script Python dans le scratchpad avec l'outil Write ; les `\1`,
   `\'` et apostrophes dans un heredoc bash se corrompent facilement.

@@ -1,13 +1,15 @@
 """Démarre la traduction d'un livret : un seul appel au lieu d'une dizaine d'étapes.
 Usage : python -X utf8 preparer.py "<chemin du livret.pdf>" "<Nom du jeu>" [--langue-ocr de-DE]
                                    [--nom-fichier "<nom en lettres latines>"]
-(scan sans --langue-ocr : lu en japonais si Windows le sait et que le texte en est, sinon en anglais)
+(scan sans --langue-ocr : lu en japonais si Windows le sait et que le texte en est, sinon en anglais, ou à défaut
+dans une autre langue à alphabet latin installée)
 
 - livret nommé en écriture non latine (japonais, chinois…) : refusé sans --nom-fichier, qui le renomme sur place ;
 - nettoie le nom du jeu pour Windows (virgules, ! et caractères interdits retirés) ;
 - crée <Ludothèque>/_outils/<Jeu>/ (Ludothèque = dossier parent de « A traduire » ou du
   dossier de jeu <Ludothèque>/<Jeu>/ s'il contient déjà _outils, sinon dossier du PDF) ;
-- détecte un livret scanné (pas de texte) et copie les bons scripts + le modèle de spec (SRC déjà rempli) ;
+- détecte un livret scanné (pas de texte visible : pages-images, avec ou sans couche OCR invisible, ou lettres en
+  tracés vectoriels → VECTEUR = True) et copie les bons scripts + le modèle de spec (SRC déjà rempli) ;
 - livret à texte : planche d'aperçu, inventaire blocks.txt, extraction et contrôle des polices, devine la langue ;
 - livret scanné : planche d'aperçu et lecture automatique du texte (ocr.py -> zones.py) si la langue est installée ;
 - cherche dans l'index et les NOTES.md des jeux déjà traduits ceux qui utilisent les mêmes polices.
@@ -96,10 +98,15 @@ def main():
     os.makedirs(os.path.join(tools, "ff"), exist_ok=True)
 
     doc = pymupdf.open(pdf)
-    text = "".join(p.get_text() for p in doc)
+    # texte visible seulement : une couche OCR invisible (mode de rendu 3, police « HiddenHorzOCR »…) sur une
+    # page-image ne se remplace pas, c'est un scan
+    text = "".join(chr(ch[0]) for p in doc for c in p.get_texttrace() if c["type"] != 3 for ch in c["chars"])
     covered = sum(1 for p in doc for i in p.get_image_info()
                   if (i["bbox"][2] - i["bbox"][0]) * (i["bbox"][3] - i["bbox"][1]) > 0.8 * p.rect.width * p.rect.height)
-    scan = len(text.strip()) < 30 * len(doc) and covered >= len(doc)
+    # lettres en tracés vectoriels (texte vectorisé) : pas de texte, des centaines de petits tracés par page
+    small = sum(1 for p in doc for d in p.get_drawings() if d["rect"].width <= 12 and d["rect"].height <= 12)
+    vecteur = len(text.strip()) < 30 * len(doc) and covered < len(doc) and small > 300 * len(doc)
+    scan = len(text.strip()) < 30 * len(doc) and (covered >= len(doc) or vecteur)
     rel = os.path.relpath(pdf, tools).replace("\\", "/").split("/")
     src_line = "SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), " + \
                ", ".join(repr(x).replace("'", '"') for x in rel) + ")"
@@ -112,10 +119,14 @@ def main():
     model = re.sub(r'^SRC = r"CHEMIN/VERS/[^"]*"  # A ADAPTER$', lambda m: "import os\n" + src_line, model,
                    flags=re.M)
     model = model.replace("de <JEU>", "de " + jeu)
+    if vecteur:
+        model = model.replace('MODE = "recouvrir"  # ou "cote"',
+                              'MODE = "recouvrir"  # ou "cote"\nVECTEUR = True  # lettres en tracés vectoriels', 1)
     open(os.path.join(tools, "spec.py"), "w", encoding="utf8").write(model)
 
     print(f"Jeu : {jeu}\nOutils : {tools}\nLivret : {len(doc)} page(s), {doc[0].rect.width:.0f} × "
-          f"{doc[0].rect.height:.0f} pt — " + ("SCANNÉ (pages-images)" if scan else "texte"))
+          f"{doc[0].rect.height:.0f} pt — " + ("texte en tracés vectoriels, traité comme un scan (VECTEUR = True)"
+                                               if vecteur else "SCANNÉ (pages-images)" if scan else "texte"))
     print(run([os.path.join(HERE, "sheet.py"), pdf, "planche", "80"], tools) or "planche*.png : aperçu créé")
 
     fonts_found = []

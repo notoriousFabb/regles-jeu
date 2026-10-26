@@ -43,6 +43,12 @@ Termes généraux, réutilisables d'un jeu à l'autre. Le vocabulaire propre à 
 | Team cards (Pack Tricks) | cartes Équipe |
 | Trump Suit Indicator | indicateur d'atout |
 | Starting / Initial Lead Player | premier meneur |
+| dealer | donneur |
+| summary card | carte Résumé |
+| NPC (joueur virtuel) | PNJ |
+| tap / untap (pivoter une carte) | engager / dégager |
+| Upgrade (effet renforcé) | Amélioration |
+| Must-Not-Follow | interdit de suivre |
 
 ## Équivalences dans d'autres langues
 Termes de base des jeux de plis ; renvoient au français du tableau ci-dessus. Compléter à chaque jeu.
