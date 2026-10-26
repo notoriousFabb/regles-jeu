@@ -19,6 +19,12 @@ retirer `build.py` (sinon `livrer.py` le prend pour moteur).
   au lieu d'être masquées et le fond reste intact (pas d'aplat visible).
 - **« cote »** (le plus fiable) : chaque page d'origine à gauche, sa traduction complète à droite ; une page de
   plus si la traduction est longue (`PAGES[page] = "<h3>…</h3><p>…</p>"`).
+- **« recomposer »** (page propre, sans l'image) : tout le livret réécrit à neuf, même découpage et mêmes
+  couleurs, sans aucune image du scan — `recomposer.md`. **À recommander pour un scan papier** (plié, froissé,
+  photographié) : recouvrir y laisse plis et aplats visibles. « Recouvrir » reste le bon choix pour une image
+  numérique propre (livret publié en images par l'auteur).
+- **Version anglaise** demandée aussi : la même spec, textes `X("français", "english")` (voir l'en-tête de
+  `spec_scan_modele.py`) ; `LANGUE=en python -X utf8 scan.py sortie_en.pdf`, livrée par `livrer.py`.
 
 ## Méthode « recouvrir »
 1. **Lecture automatique** : `preparer.py` lance `ocr.py` (reconnaissance de texte de Windows), qui écrit
@@ -51,7 +57,13 @@ retirer `build.py` (sinon `livrer.py` le prend pour moteur).
    - agrandir chaque masque d'environ 1,5 pt vers le bas (jambages du texte d'origine) ; commencer les listes
      numérotées assez à gauche pour couvrir les numéros d'origine ;
    - fond sombre ou coloré mal deviné (bulle, encadré) : `bg="#rrggbb"` mesuré sur l'original ; `M(...)` pour
-     effacer sans remplacer.
+     effacer sans remplacer ;
+   - **encadrés semi-transparents sur fond texturé** (ciel étoilé, photo) : l'anneau mesuré autour de la zone
+     attrape le fond derrière l'encadré, aplats trop sombres : `BG = "dominant"` en tête de spec (couleur la plus
+     fréquente DANS la zone), et zones gardées strictement à l'intérieur des encadrés (Hit and Win) ;
+   - titre souligné d'un filet (vert, couleur) juste dessous : arrêter le bas du masque au-dessus du filet, mesuré
+     sur l'image (pixels de la couleur du filet), sinon il disparaît ;
+   - nom japonais dans une police de remplacement sans kanji : le romaniser (ou garder la zone d'origine).
    Journal : « police réduite à … (N pt) », « DÉBORDE » (raccourcir ou agrandir la zone) ; en dessous de
    ~4,5 pt imprimé, prévenir l'utilisateur. **« À VÉRIFIER »** : masques d'où une ligne d'origine dépasse
    (fausses alertes possibles sur les bulles et les dessins).

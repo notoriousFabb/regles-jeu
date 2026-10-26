@@ -8,7 +8,9 @@ MODE "recouvrir" : ZONES = rectangles de texte de l'image ; chacun est masqué p
         défaut 0.5), align ("left", "center", "right", "justify"), color ("#rrggbb", défaut noir), fam / bold / ital,
         lead (interligne en multiple de la taille, défaut 1.15), pad (marge intérieure, défaut 0.5 ; zone d'une
         seule ligne : lead 1.0 et pad -0.6 d'office),
-        bg ("auto" = couleur du fond autour de la zone, "#rrggbb", None = ne pas masquer),
+        bg ("auto" = couleur du fond autour de la zone, "dominant" = couleur la plus fréquente DANS la zone, pour
+            des encadrés semi-transparents sur fond texturé, "#rrggbb", None = ne pas masquer ; BG = défaut de toutes
+            les zones),
         en ("texte d'origine", repris de zones.py : sert à relecture.py),
         rot (90, -90 ou 180 : texte tourné, pour une étiquette verticale ; la zone reste celle de l'image)
     M(page, (x0, y0, x1, y1), bg="auto") — masque seul (effacer un texte sans le remplacer)
@@ -20,10 +22,20 @@ MODE "recouvrir" : ZONES = rectangles de texte de l'image ; chacun est masqué p
 MODE "cote" : PAGES = {page: html} ; chaque page d'origine à gauche, sa traduction complète à droite.
     SIDE_WIDTH (largeur de la colonne française en multiple de la page, défaut 1.0), SIDE_STYLE (style du texte),
     SIDE_MARGIN, SIDE_GAP. Si la traduction est trop longue, elle continue sur une page de plus.
-html : <b>, <i>, <br/>, <p>, <h3>, <ul><li>… ; la typographie française (espaces insécables) est posée par scan.py."""
+html : <b>, <i>, <br/>, <p>, <h3>, <ul><li>… ; la typographie française (espaces insécables) est posée par scan.py.
+VERSION ANGLAISE (facultatif) : écrire chaque texte X("français", "english") ; `LANGUE=en python -X utf8 scan.py
+  sortie_en.pdf` construit l'anglais (PowerShell : $env:LANGUE="en"), livrer.py livre alors aussi <nom>_EN.pdf."""
 
+import os
 SRC = r"CHEMIN/VERS/livret_scanne.pdf"  # A ADAPTER
 MODE = "recouvrir"  # ou "cote"
+BG = "auto"  # fond par défaut des masques : "auto" (autour de la zone) ou "dominant" (dans la zone)
+LANGUE = os.environ.get("LANGUE", "fr")  # fr, ou en pour la version anglaise
+
+
+def X(fr, en):
+    """Texte dans la langue construite (spec bilingue)."""
+    return fr if LANGUE == "fr" else en
 
 CSS = """
 @font-face{font-family:Av;src:url(AlegreyaSans-Regular.ttf);}

@@ -20,10 +20,19 @@ IGNORE (facultatif) : lignes volontairement non traduites, pour que le rapport �
 INCLINEES (facultatif) : étiquettes penchées, [(page, "texte exact de la ligne", "français")] : reposées au même
   angle, même couleur et même police (references/pieges.md).
 CONTOURS (facultatif) : {page: [(x0, y0, x1, y1)]} titres dont les lettres sont doublées d'un contour en tracés :
-  ces tracés ne sont plus peints (sinon lettres fantômes autour du français)."""
+  ces tracés ne sont plus peints (sinon lettres fantômes autour du français).
+VERSION ANGLAISE (facultatif) : écrire chaque texte X("français", "english") ; `LANGUE=en python -X utf8 build.py
+  sortie_en.pdf` construit l'anglais (PowerShell : $env:LANGUE="en"), livrer.py livre alors aussi <nom>_EN.pdf."""
 
+import os
 # ---------------------------------------------------------------- réglages du jeu (build.py n'a rien à modifier)
 SRC = r"CHEMIN/VERS/livret_original.pdf"  # A ADAPTER
+LANGUE = os.environ.get("LANGUE", "fr")  # fr, ou en pour la version anglaise
+
+
+def X(fr, en):
+    """Texte dans la langue construite (spec bilingue)."""
+    return fr if LANGUE == "fr" else en
 
 # Polices de remplacement, dans le dossier ff/ (une famille courte par police : Av, H…)
 CSS = """

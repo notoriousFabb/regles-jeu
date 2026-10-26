@@ -29,6 +29,11 @@ Le message te donne le dossier d'outils du jeu (`_outils/<Jeu>/`) et le dossier 
    - **alertes automatiques** de `relecture.py` : dire pour chacune si c'est un vrai problème ou une fausse
      alerte.
    Ne pas signaler les espaces insécables (posées par le moteur) ni la mise en page.
+5. **Spec bilingue** (textes `X("français", "english")` dans spec.py) : relire aussi l'anglais —
+   `LANGUE=en python -X utf8 relecture.py` (PowerShell : `$env:LANGUE="en"`) écrit `texte_en.txt` ; mêmes
+   contrôles de sens, d'oublis et de cohérence, contre l'original et non contre le français ; langue anglaise
+   naturelle. Les guillemets droits de l'anglais sont changés en “ ” par le moteur : ne pas les signaler.
+   Préciser FR ou EN devant chaque problème.
 
 ## Rapport (ta réponse finale, rien d'autre)
 Seulement les problèmes réels, du plus grave au moins grave, au plus 25 lignes :

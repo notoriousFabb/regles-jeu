@@ -21,6 +21,14 @@ s'y notent aussi, pas dans la skill (dépôt git partagé).
 - Livret seulement consultable en ligne (lien Google Drive sans téléchargement) : `en-ligne.md`.
 - Sans dossier de dépôt (PDF posé ailleurs) : outils dans `_outils/<Jeu>/` à côté du PDF, rien n'est déplacé.
 
+## Nom du fichier du livret (écriture non latine)
+`preparer.py` refuse un livret nommé en japonais, chinois… ; relancer avec `--nom-fichier "<nom>"`, qui le renomme
+sur place (le `_FR.pdf` en découle). Nom : le titre `<Jeu>` en lettres latines (titre anglais officiel s'il
+existe, sinon la romanisation imprimée), puis les autres mots traduits en anglais (説明書, ルール, ルールブック →
+`Rules` ; 正誤表 → `Errata` ; 拡張 → `Expansion` ; サマリー → `Summary`), en gardant langue, version et date
+(`_JP`, `v1.2`) : `コスモショーファー_JP_Rule_v1.2.pdf` → `Cosmo Chauffeur_JP_Rule_v1.2.pdf`, `夜連_説明書.pdf` →
+`Who follows me_Rules.pdf`. Noter l'ancien nom dans `NOTES.md` (« Sources » : « renommé en … »).
+
 ## Nom `<Jeu>`
 Titre imprimé en lettres latines (titre anglais officiel ou romanisation pour un titre japonais, chinois…),
 nettoyé pour Windows — `preparer.py` le fait :

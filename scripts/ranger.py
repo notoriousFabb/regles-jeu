@@ -22,7 +22,8 @@ KEEP_RANGES = [(0x20, 0x7E), (0xA0, 0x24F), (0x2B0, 0x36F), (0x1E00, 0x1EFF), (0
                (0x20A0, 0x20CF), (0x2100, 0x218F), (0x2190, 0x22FF), (0x2300, 0x23FF), (0x2460, 0x24FF),
                (0x2500, 0x27BF), (0x2B00, 0x2BFF), (0x3000, 0x303F), (0x30FB, 0x30FB), (0xFF01, 0xFF5E),
                (0xFFFD, 0xFFFD)]
-JUNK_FILES = ("blocks.txt", "court.txt", "zones.py", "texte_fr.txt", "relecture.txt")
+JUNK_FILES = ("blocks.txt", "court.txt", "zones.py", "texte_fr.txt", "relecture.txt", "texte_en.txt",
+              "relecture_en.txt")
 JUNK_DIRS = ("fonts", "cand", "vue", "__pycache__")
 
 

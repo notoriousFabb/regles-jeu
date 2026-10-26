@@ -9,7 +9,8 @@ dans une autre langue à alphabet latin installée)
 - crée <Ludothèque>/_outils/<Jeu>/ (Ludothèque = dossier parent de « A traduire » ou du
   dossier de jeu <Ludothèque>/<Jeu>/ s'il contient déjà _outils, sinon dossier du PDF) ;
 - détecte un livret scanné (pas de texte visible : pages-images, avec ou sans couche OCR invisible, ou lettres en
-  tracés vectoriels → VECTEUR = True) et copie les bons scripts + le modèle de spec (SRC déjà rempli) ;
+  tracés vectoriels → VECTEUR = True) et copie les bons scripts + le modèle de spec (SRC déjà rempli ;
+  version anglaise possible dans la même spec : textes X("fr", "en"), voir l'en-tête du modèle) ;
 - livret à texte : planche d'aperçu, inventaire blocks.txt, extraction et contrôle des polices, devine la langue ;
 - livret scanné : planche d'aperçu et lecture automatique du texte (ocr.py -> zones.py) si la langue est installée ;
 - cherche dans l'index et les NOTES.md des jeux déjà traduits ceux qui utilisent les mêmes polices.
@@ -116,7 +117,8 @@ def main():
     if scan and os.path.isfile(SYMBOLS):
         shutil.copy(SYMBOLS, os.path.join(tools, "ff"))
     model = open(os.path.join(HERE, "spec_scan_modele.py" if scan else "spec_modele.py"), encoding="utf8").read()
-    model = re.sub(r'^SRC = r"CHEMIN/VERS/[^"]*"  # A ADAPTER$', lambda m: "import os\n" + src_line, model,
+    imp = "" if re.search(r"^import os$", model, re.M) else "import os\n"
+    model = re.sub(r'^SRC = r"CHEMIN/VERS/[^"]*"  # A ADAPTER$', lambda m: imp + src_line, model,
                    flags=re.M)
     model = model.replace("de <JEU>", "de " + jeu)
     if vecteur:
@@ -152,7 +154,15 @@ def main():
                  if not f.endswith(".txt")] if os.path.isdir(fdir) else []
         if files:
             out = run(["polices.py", "glyphes"] + files, tools)
-            print("\n".join(l for l in out.splitlines() if l.startswith("==") or "français" in l))
+            # regroupé par liste de caractères manquants : souvent la même pour toutes les polices (sous-ensembles)
+            groupes, nom = {}, None
+            for l in out.splitlines():
+                if l.startswith("=="):
+                    nom = l.strip("= ").strip()
+                elif "français manquants" in l and nom:
+                    groupes.setdefault(l.split(":", 1)[1].strip(), []).append(nom)
+            for manque, noms in groupes.items():
+                print(f"français manquants : {manque} — {', '.join(noms)}")
         fonts_found = [os.path.splitext(os.path.basename(f))[0] for f in files]
 
     # jeux déjà traduits qui utilisent les mêmes polices

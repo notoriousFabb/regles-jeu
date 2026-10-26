@@ -51,6 +51,9 @@ Termes généraux, réutilisables d'un jeu à l'autre. Le vocabulaire propre à 
 | tap / untap (pivoter une carte) | engager / dégager |
 | Upgrade (effet renforcé) | Amélioration |
 | Must-Not-Follow | interdit de suivre |
+| may follow (JP メイフォロー) | fournir facultatif |
+| bid (JP ビッド) | annonce |
+| bust (dépasser 21) | « vous sautez (Bust) ! » |
 
 ## Équivalences dans d'autres langues
 Termes de base des jeux de plis ; renvoient au français du tableau ci-dessus. Compléter à chaque jeu.

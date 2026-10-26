@@ -18,9 +18,11 @@ Le message te donne le dossier d'outils du jeu, le PDF d'origine, le PDF constru
 2. Vue d'ensemble : `python -X utf8 side.py "<original>" "<construit>" all 80` → `side<N>.png`
    (original à gauche, français à droite) ; regarder chaque image.
 3. Zooms, seulement sur les endroits signalés par le journal ou douteux sur la vue d'ensemble :
-   `python -X utf8 -c "import pymupdf; d=pymupdf.open(r'<construit>'); d[P].get_pixmap(clip=(x0,y0,x1,y1), dpi=200).save('zoom_P_k.png')"`
+   `python -X utf8 -c "import pymupdf; d=pymupdf.open(r'<construit>'); d[P].get_pixmap(clip=(x0,y0,x1,y1), dpi=150).save('zoom_P_k.png')"`
    (coordonnées en points PDF, origine en haut à gauche ; page de largeur et hauteur données par `d[P].rect`).
-   Au plus une quinzaine de zooms.
+   Au plus 8 zooms, chacun sur une zone étroite (pas une demi-page) ; dpi 200 seulement pour un texte de moins
+   de 6 pt. Deux PDF à contrôler (français et anglais) : vue d'ensemble des deux, zooms surtout sur le premier,
+   puis seulement aux mêmes endroits sur le second.
 4. Chercher :
    - texte français qui chevauche une image, un autre texte, ou un reste de texte d'origine ;
    - texte coupé, qui sort de son cadre, de sa colonne ou de la page ;

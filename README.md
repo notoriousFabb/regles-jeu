@@ -53,6 +53,8 @@ After You Betobeto-san, The Final Bosses' Blues et Man Eating House (anglais).
   remplacé par le français, ou traduction placée à côté de chaque page.
 - **Contrôle son propre travail** : texte oublié, chevauchements, débordements, fautes, termes du glossaire non
   respectés, paragraphes anormalement courts.
+- **Fait aussi la version anglaise** si on la demande (utile pour un livret japonais) : la même spec contient
+  les deux textes, et la livraison produit `<nom>_FR.pdf` et `<nom>_EN.pdf`.
 - **Range tout** : livrets dans un dossier par jeu, outils allégés à part, index des jeux traduits.
 
 Préférences de traduction appliquées :
@@ -205,11 +207,14 @@ valeur" » (voir [plus bas](#corriger-une-traduction-déjà-faite)).
 ---
 
 ## Livrets scannés
-Un livret dont les pages sont des images (pas de texte sélectionnable) est détecté automatiquement. Deux rendus
+Un livret dont les pages sont des images (pas de texte sélectionnable) est détecté automatiquement. Trois rendus
 au choix :
-- **Recouvrir** (conseillé) : chaque zone de texte de l'image est masquée par la couleur du fond mesurée autour,
-  et le français est posé dedans, la police étant réduite au besoin pour tenir.
+- **Recouvrir** (conseillé pour une image numérique propre) : chaque zone de texte de l'image est masquée par la
+  couleur du fond mesurée autour (ou, pour des encadrés semi-transparents, la couleur dominante de la zone), et le
+  français est posé dedans, la police étant réduite au besoin pour tenir.
 - **Côte à côte** : chaque page d'origine reste intacte, sa traduction complète est placée à droite.
+- **Recomposer** (conseillé pour un scan papier plié ou froissé) : le livret est réécrit à neuf, même découpage
+  et mêmes couleurs, sans l'image du scan (`references/recomposer.md`, exemple dans `exemples/recomposer/`).
 
 Le texte de l'image est lu automatiquement (`ocr.py`, moteur de Windows, résolution adaptée à celle du scan ;
 japonais choisi seul quand le livret en contient) et regroupé en paragraphes
@@ -257,6 +262,7 @@ Le texte dessiné dans les images reste dans la langue d'origine. Détails : `re
 **Relecture du texte** (`relecture.py`) : écrit `texte_fr.txt` (original et français, paragraphe par paragraphe)
 et signale les mots inconnus du dictionnaire, les fautes de typographie, l'anglais resté, les termes du glossaire
 non respectés (« trump » sans « atout ») et les paragraphes anormalement courts ou longs (signe d'un oubli).
+Avec `LANGUE=en`, elle relit la version anglaise (`texte_en.txt`, orthographe anglaise).
 
 **Deux agents relecteurs** (`agents/`), lancés en parallèle :
 - **relecteur-texte** lit tout le texte et rend les contresens, oublis, incohérences de vocabulaire et fautes,
@@ -303,7 +309,9 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
   - `dossiers.md` : organisation des dossiers, noms de jeux, index et notes ;
   - `langues.md` : langue de départ, livrets multilingues, longueur du français selon la langue, texte vertical ;
   - `scan.md` : livrets scannés (lecture automatique, zones, rendus) ;
-  - `page-web.md` : règles publiées sur une page web (page traduite puis remise en PDF) ;
+  - `recomposer.md` : livret recomposé à neuf, sans l'image du scan ;
+  - `page-web.md` : règles publiées sur une page web (page traduite puis remise en PDF ; page bilingue,
+    version anglaise) ;
   - `en-ligne.md` : livret seulement consultable en ligne (Google Drive) : où chercher le PDF, captures de
     l'utilisateur ;
   - `source.md` : vérifier une règle traduite contre l'original (Tokyo Game Market pour les jeux japonais) ;
@@ -324,7 +332,10 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
   - `sheet.py` / `side.py` : planche d'aperçu et images côte à côte original / français ;
   - `relecture.py` : relecture du texte seul ;
   - `page_web.py` : texte d'une page web à traduire, et page française reconstruite ;
-  - `livrer.py` : livraison ; `ranger.py` : allègement du dossier d'outils.
+  - `livrer.py` : livraison (version anglaise comprise ; `--pdf` pour une traduction faite sans spec) ;
+    `ranger.py` : allègement du dossier d'outils.
+- `exemples/recomposer/` : `noir.py` et `textes.py`, moteur et texte d'un livret recomposé à neuf (CMYK), à copier
+  et adapter.
 
 ---
 

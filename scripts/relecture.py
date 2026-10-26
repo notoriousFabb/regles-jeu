@@ -9,11 +9,14 @@ Signale (affiché et dans relecture.txt) :
 - vocabulaire (original anglais) : terme du glossaire de la skill présent dans l'original, mais traduction attendue
   absente du français (« lead » sans « entam… ») ;
 - longueur : paragraphe français beaucoup plus court (oubli ?) ou plus long (ajout ?) que l'original.
-Livret scanné : l'original vient de Z(..., en="texte d'origine") s'il est donné (texte de zones.py)."""
+Livret scanné : l'original vient de Z(..., en="texte d'origine") s'il est donné (texte de zones.py).
+Spec bilingue (X("fr", "en")) : `LANGUE=en python -X utf8 relecture.py` relit la version anglaise et écrit
+texte_en.txt (orthographe anglaise ; contrôles propres au français et au glossaire laissés de côté)."""
 import html as htmlmod, os, re, runpy, sys
 import pymupdf
 
 HERE = os.getcwd()
+LANG = os.environ.get("LANGUE", "fr")
 SKILL_REFS = [os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "references"),
               os.path.expanduser("~/.claude/skills/traduction-regles-jeu/references")]
 EN_COMMON = {"the", "and", "with", "your", "you", "player", "players", "card", "cards", "trick", "tricks", "round",
@@ -106,13 +109,14 @@ def main():
         if en:
             out.append(f"  < {en}")
         out.append(f"  > {fr}")
-    open("texte_fr.txt", "w", encoding="utf8").write("\n".join(out).strip() + "\n")
+    texte = f"texte_{LANG}.txt"
+    open(texte, "w", encoding="utf8").write("\n".join(out).strip() + "\n")
 
     report = []
     # orthographe
     try:
         from spellchecker import SpellChecker
-        sp = SpellChecker(language="fr")
+        sp = SpellChecker(language=LANG if LANG in ("fr", "en", "de", "es", "it", "pt") else "fr")
         notes = os.path.join(HERE, "NOTES.md")
         own = set(re.findall(r"[a-zà-ÿœ'-]+", open(notes, encoding="utf8").read().lower())) \
             if os.path.isfile(notes) else set()
@@ -120,7 +124,9 @@ def main():
         for pno, tag, en, fr in items:
             fr = re.sub(r"\S+://\S+|\S+@\S+|www\.\S+", " ", fr)  # adresses web et e-mails
             for w in re.findall(r"(?<![\w-])[a-zà-ÿœ][a-zà-ÿœ'-]*[a-zà-ÿœ](?![\w-])", fr):
-                w2 = re.sub(r"^(?:[ldjmnstc]|qu|jusqu|lorsqu|puisqu)'", "", w.replace("’", "'"))
+                w2 = w.replace("’", "'")
+                w2 = re.sub(r"^(?:[ldjmnstc]|qu|jusqu|lorsqu|puisqu)'", "", w2) if LANG == "fr" else \
+                    re.sub(r"'(s|t|re|ll|ve|d|m)$", "", w2)
                 if len(w2) > 2 and w2 not in EXTRA_OK and w2 not in own:
                     words.setdefault(w2, []).append(f"p{pno} {tag}")
         unknown = set()
@@ -137,19 +143,23 @@ def main():
     # typographie et anglais resté
     typo = []
     for pno, tag, en, fr in items:
-        for pat, msg in ((r"  +", "espaces doubles"), (r" [,.](?!\d)", "espace avant , ou ."), (r'"', "guillemet droit"),
-                         (r"[a-zà-ÿ][.!?] [a-zà-ÿ]", "minuscule après un point")):
+        controles = [(r"  +", "espaces doubles"), (r" [,.](?!\d)", "espace avant , ou ."),
+                     (r"[a-zà-ÿ][.!?] [a-zà-ÿ]", "minuscule après un point")]
+        if LANG == "fr":  # en anglais, le moteur change lui-même " " en “ ”
+            controles.append((r'"', "guillemet droit"))
+        for pat, msg in controles:
             if re.search(pat, fr):
                 typo.append(f"  p{pno} {tag} : {msg} — « {fr[:60]} »")
         eng = [w for w in re.findall(r"[A-Za-z]+", fr) if w.lower() in EN_COMMON]
-        if len(eng) >= 2:
+        if LANG == "fr" and len(eng) >= 2:
             typo.append(f"  p{pno} {tag} : anglais resté ? ({', '.join(eng[:4])}) — « {fr[:60]} »")
     if typo:
         report.append(f"TYPOGRAPHIE / ANGLAIS RESTÉ ({len(typo)}) :")
         report += typo[:30]
     # vocabulaire
     voc = {}
-    pairs = sorted((pr for pr in glossary() if pr[0] not in AMBIGUOUS), key=lambda pr: -len(pr[0]))
+    pairs = sorted((pr for pr in glossary() if pr[0] not in AMBIGUOUS), key=lambda pr: -len(pr[0])) \
+        if LANG == "fr" else []  # le glossaire va de l'anglais au français
     masked = [en.lower() for _, _, en, _ in items]  # les expressions longues (« lead color ») passent d'abord
     for e, f_ in pairs:
         st = stem(f_)
@@ -172,9 +182,10 @@ def main():
         report += lng[:20]
     if not report:
         report.append("Relecture automatique : rien à signaler.")
-    report.append(f"\nTexte complet (original et français) : texte_fr.txt ({sum(len(i[3]) for i in items)} caractères "
-                  f"de français) — le lire en entier.")
-    open("relecture.txt", "w", encoding="utf8").write("\n".join(report) + "\n")
+    report.append(f"\nTexte complet (original et traduction) : {texte} ({sum(len(i[3]) for i in items)} caractères "
+                  f"de traduction) — le lire en entier.")
+    open("relecture.txt" if LANG == "fr" else f"relecture_{LANG}.txt", "w", encoding="utf8").write(
+        "\n".join(report) + "\n")
     print("\n".join(report))
 
 

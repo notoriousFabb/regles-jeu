@@ -40,10 +40,17 @@ texte condensé, pas d'image remplacée.
 6. **Relire** : relecteur de texte avec `web/page_1_segments.txt` et `traduction.py` (pas de `spec.py` :
    lui dire de comparer chaque morceau à sa traduction au lieu de lancer `relecture.py`) ; relecteur visuel
    avec le PDF d'origine et le PDF français (`side.py` marche sur deux PDF quelconques).
-7. **Livrer** à la main (`livrer.py` attend un `spec.py`) : déplacer le PDF d'origine de `A traduire/` dans
-   `<Jeu>/`, y copier `<nom>_FR.pdf` (même règle de nom que `livrer.py` : mention de langue retirée, `_FR` à la fin),
-   ajouter la ligne du jeu dans `_outils/LISEZMOI.md` (Type : « page web ») et écrire `NOTES.md` (lien de la
-   page, options de `page_pdf.py`, commandes des étapes 1, 2 et 4, vocabulaire, compromis).
+7. **Livrer** : écrire `NOTES.md` (lien de la page, options de `page_pdf.py`, commandes des étapes 1, 2 et 4,
+   vocabulaire, compromis), puis `livrer.py "<outils>" --original "<PDF d'origine>" --pdf "<sortie>_FR.pdf"
+   --type "page web"` : original déplacé dans `<Jeu>/`, `<nom>_FR.pdf` copié (mention de langue retirée), ligne
+   d'index.
+
+## Page bilingue, version anglaise
+- **Page en deux langues** (japonais + anglais sur la même page, billet de blog Game Market) : traduire d'après
+  la langue d'origine, l'autre sert de contrôle ; vider les morceaux de la seconde langue (`""`) pour un livret
+  français seul, sauf demande contraire.
+- **Version anglaise aussi** : un second fichier de traduction (`traduction_en.py`, même découpage), construit
+  de la même façon (`web/page_1_en.html` → `<sortie>_EN.pdf`), livré avec `--pdf-en "<sortie>_EN.pdf"`.
 
 ## Corriger plus tard
 Modifier `traduction.py`, relancer `construire` puis `page_pdf.py` (étape 4). Si le site a changé, refaire

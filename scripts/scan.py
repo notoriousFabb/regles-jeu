@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Traduction d'un livret SCANNÉ (pages-images, sans texte sélectionnable) d'après spec.py (voir spec_scan_modele.py).
 
-MODE "recouvrir" : chaque zone de texte de l'image est masquée (couleur du fond prise autour) et le français posé
-                   dedans, police réduite automatiquement pour tenir.
+MODE "recouvrir" : chaque zone de texte de l'image est masquée (couleur du fond prise autour, ou bg="dominant" :
+                   couleur la plus fréquente dans la zone) et le français posé dedans, police réduite pour tenir.
 MODE "cote"      : chaque page d'origine à gauche, sa traduction à droite (suite sur une page de plus si besoin).
 Usage : python -X utf8 scan.py sortie.pdf      (journal affiché et enregistré dans <sortie>_journal.txt)"""
 import io, os, re, statistics, sys
@@ -35,12 +35,32 @@ src = pymupdf.open(spec.SRC)
 log = []
 
 
+LANGUE = getattr(spec, "LANGUE", "fr")  # spec bilingue : variable d'environnement LANGUE (fr / en)
+
+
 def typo(html):
-    html = re.sub(r" ([:;!?»])", " \\1", html)
-    html = html.replace("« ", "« ")
-    html = re.sub(r"(?<=[A-Za-zÀ-ÿ])'", "’", html)
-    html = re.sub(r"(?<=\b\d) (?=[a-zà-ÿ])", " ", html)
-    return html
+    """Typographie du texte seulement, jamais dans les balises (un <span style='…'> était cassé par ’).
+    Français : espaces insécables (: ; ! ? « »). Autre langue (spec bilingue, LANGUE=en) : guillemets “ ”."""
+    parts = re.split(r"(<[^>]*>)", html)
+    ouvert = False
+    for i in range(0, len(parts), 2):
+        t = parts[i]
+        t = re.sub(r"(?<=[A-Za-zÀ-ÿ])'", "\u2019", t)
+        t = re.sub(r"(?<=\b\d) (?=[a-zà-ÿ])", "\u00a0", t)
+        if LANGUE == "fr":
+            t = re.sub(r" ([:;!?»])", " \\1", t)
+            t = t.replace("« ", "« ")
+        else:  # guillemets droits → “ ”, en alternant (une paire peut entourer une balise <b>)
+            out = []
+            for c in t:
+                if c == '"':
+                    out.append("\u201d" if ouvert else "\u201c")
+                    ouvert = not ouvert
+                else:
+                    out.append(c)
+            t = "".join(out)
+        parts[i] = t
+    return "".join(parts)
 
 
 def check_page(pno, what):
@@ -69,6 +89,28 @@ def ring_color(page, r, pix_cache={}):
     return tuple(statistics.median(p[i] for p in px) / 255 for i in range(3))
 
 
+def dominant_color(page, r, pix_cache={}):
+    """Most frequent colour INSIDE the zone (the text is a minority there) — for semi-transparent boxes over a
+    textured background, where the ring around the zone catches the background behind the box."""
+    if page.number not in pix_cache:
+        pix_cache[page.number] = page.get_pixmap(dpi=144)
+    pix, k = pix_cache[page.number], 144 / 72
+    x0, y0, x1, y1 = (int(v * k) for v in (r & page.rect))
+    count, total = {}, {}
+    for y in range(max(y0, 0), min(y1, pix.height), 2):
+        for x in range(max(x0, 0), min(x1, pix.width), 2):
+            c = pix.pixel(x, y)[:3]
+            q = tuple(v // 24 for v in c)
+            count[q] = count.get(q, 0) + 1
+            t = total.setdefault(q, [0, 0, 0])
+            for i in range(3):
+                t[i] += c[i]
+    if not count:
+        return (1, 1, 1)
+    q = max(count, key=count.get)
+    return tuple(total[q][i] / count[q] / 255 for i in range(3))
+
+
 def hexcol(c):
     if isinstance(c, str):
         v = int(c.lstrip("#"), 16)
@@ -88,9 +130,12 @@ def recouvrir():
         r = pymupdf.Rect(z["rect"])
         if r.is_empty or not r.intersects(src[z["page"]].rect):
             fail(f"{tag} : rectangle vide ou hors de la page {tuple(src[z['page']].rect)}")
-        bg = z.get("bg", "auto")
+        bg = z.get("bg", getattr(spec, "BG", "auto"))  # BG de spec.py : fond par défaut de toutes les zones
         if bg:  # colours are measured on the untouched page, before any cover is painted
-            covers.append((z["page"], r, ring_color(src[z["page"]], r) if bg == "auto" else hexcol(bg), bg != "auto"))
+            col = (ring_color(src[z["page"]], r) if bg == "auto" else
+                   dominant_color(src[z["page"]], r) if bg == "dominant" else hexcol(bg))
+            # 4e valeur : couleur imposée par le spec (« auto » et « dominant » sont mesurées sur l'image)
+            covers.append((z["page"], r, col, bg not in ("auto", "dominant")))
         if z.get("html") is not None:
             texts.append((tag, z, r))
     if getattr(spec, "VECTEUR", False):

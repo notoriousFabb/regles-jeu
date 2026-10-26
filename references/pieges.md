@@ -91,3 +91,17 @@ La plupart sont déjà gérés par `scripts/build.py` ; ce qui reste à faire da
   de U+0020.
 - **Modifier spec/build par script** : écrire le script Python dans le scratchpad avec l'outil Write ; les `\1`,
   `\'` et apostrophes dans un heredoc bash se corrompent facilement.
+- **Gras et italique invisibles** (une seule police variable embarquée, Noto Sans KR « Thin » : `blocks.txt` et
+  `get_texttrace` ne montrent aucune différence) : les repérer sur un agrandissement et les remettre à la main
+  (`<b>`, `<i>`) ; il faut alors des fichiers gras / italique dans `ff/` (polices.md).
+- **Plusieurs couleurs dans un paragraphe** (une ligne rouge puis du noir) : le moteur prend la couleur la plus
+  présente pour tout le paragraphe ; marquer l'autre partie `<span style="color:#000000">…</span>` (taille
+  différente : `font-size:11pt` dans le même style).
+- **Titres d'étapes soulignés** (① ② ③) : `u {text-decoration:underline;}` dans le CSS et `<u>…</u>`, sinon le
+  soulignement d'origine est retiré sans être remplacé (journal : « soulignement(s) d'origine retiré(s) »).
+- **Paragraphe court qui garde la largeur d'un caractère** (titre d'un seul kanji, « 例 » → « Exemple » minuscule) :
+  `x1=` sur le paragraphe.
+- **Texte japonais gardé** (titre, noms des crédits) dans une police de remplacement réduite au latin : il
+  disparaît (carrés) ; le laisser dans `IGNORE` ou le romaniser.
+- **Icône rattachée à la mauvaise ligne** (lignes hautes qui se chevauchent) : le moteur la rattache à la ligne
+  dont le milieu est le plus proche ; si une icône sort encore décalée d'une ligne, vérifier `blocks.txt`.

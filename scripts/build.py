@@ -326,16 +326,36 @@ NBSP_WORDS = (r"(?:[Jj]oueurs?|[Pp]ages?|[Éé]tapes?|[Mm]anches?|[Pp]lis|[Cc]ar
               r"[Ee]xemples?|[Pp]oints?)")
 
 
+LANGUE = getattr(spec, "LANGUE", "fr")  # spec bilingue : variable d'environnement LANGUE (fr / en)
+
+
 def typo(html):
-    html = re.sub(r" ([:;!?»])", " \\1", html)
-    html = html.replace("« ", "« ")
-    html = re.sub(r"(?<=[A-Za-zÀ-ÿ])'", "’", html)
-    html = html.replace(" {}", " {}")
-    html = re.sub(r"(?<=\b\d) (?=[a-zà-ÿ])", " ", html)
-    # « Bleu 19 », « joueur A », « page 3 », « étape 2 » : pas de coupure entre le mot et son numéro
-    html = re.sub(r"\b([A-ZÀ-Ý][a-zà-ÿ]{1,12}) (?=\d+\b)", "\\1 ", html)
-    html = re.sub(r"\b(" + NBSP_WORDS + r") (?=(?:\d+|[A-Z])\b)", "\\1 ", html)
-    return html
+    """Typographie du texte seulement, jamais dans les balises (un <span style='…'> était cassé par ’).
+    Français : espaces insécables (: ; ! ? « »). Autre langue (spec bilingue, LANGUE=en) : guillemets “ ”."""
+    parts = re.split(r"(<[^>]*>)", html)
+    ouvert = False
+    for i in range(0, len(parts), 2):
+        t = parts[i]
+        t = re.sub(r"(?<=[A-Za-zÀ-ÿ])'", "\u2019", t)
+        t = t.replace(" {}", "\u00a0{}")
+        t = re.sub(r"(?<=\b\d) (?=[a-zà-ÿ])", "\u00a0", t)
+        if LANGUE == "fr":
+            t = re.sub(r" ([:;!?»])", " \\1", t)
+            t = t.replace("« ", "« ")
+            # « Bleu 19 », « joueur A », « page 3 », « étape 2 » : pas de coupure entre le mot et son numéro
+            t = re.sub(r"\b([A-ZÀ-Ý][a-zà-ÿ]{1,12}) (?=\d+\b)", "\\1\u00a0", t)
+            t = re.sub(r"\b(" + NBSP_WORDS + r") (?=(?:\d+|[A-Z])\b)", "\\1\u00a0", t)
+        else:  # guillemets droits → “ ”, en alternant (une paire peut entourer une balise <b>)
+            out = []
+            for c in t:
+                if c == '"':
+                    out.append("\u201d" if ouvert else "\u201c")
+                    ouvert = not ouvert
+                else:
+                    out.append(c)
+            t = "".join(out)
+        parts[i] = t
+    return "".join(parts)
 
 
 def marker(width, size):
@@ -600,13 +620,15 @@ for pno, flows in sorted(by_page.items()):
                 if ic.get("taken"):
                     continue
                 c = (ic["rect"].tl + ic["rect"].br) / 2
-                for l in lines:
-                    r = pymupdf.Rect(l["bbox"])
-                    if r.y0 - 1 <= c.y <= r.y1 + 1 and xs0 <= c.x <= xs1:
-                        base = l["spans"][0]["origin"][1]
-                        ic.update(taken=True, base=base, off=(c.y - base) / l["spans"][0]["size"])
-                        mine.append(ic)
-                        break
+                # line whose middle (baseline - 0.35 size) is nearest: tall line boxes (Noto Sans KR…) overlap,
+                # and the first matching line could be the one above
+                cand = [l for l in lines if pymupdf.Rect(l["bbox"]).y0 - 1 <= c.y <= pymupdf.Rect(l["bbox"]).y1 + 1
+                        and xs0 <= c.x <= xs1]
+                if cand:
+                    l = min(cand, key=lambda l: abs(c.y - (l["spans"][0]["origin"][1] - 0.35 * l["spans"][0]["size"])))
+                    base = l["spans"][0]["origin"][1]
+                    ic.update(taken=True, base=base, off=(c.y - base) / l["spans"][0]["size"])
+                    mine.append(ic)
             mine.sort(key=lambda ic: (round(ic["base"]), ic["rect"].x0))
             lifted += mine
             for r in allrects:

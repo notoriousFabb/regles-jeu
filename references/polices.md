@@ -56,6 +56,14 @@ de l'espace : au-delà de ~0,3 em le texte paraît justifié
 | Myriad (scan) | Source Sans 3 400 / 600 (instancer) | Google Fonts |
 | serif évasé type Trajan minuscule | Marcellus (pas de gras : Spectral SemiBold pour `<b>`) | Google Fonts |
 | Arial Narrow / Palatino d'un scan | ARIALN*.TTF, pala*.ttf de Windows | corriger U+00A0 d'ARIALNB (pieges.md) |
+| Yu Gothic Regular / Bold (aussi Aptos, MS Gothic des mêmes livrets) | Yu Gothic de Windows, extraite de `YuGothR.ttc` / `YuGothB.ttc` (fontTools `TTCollection`, la police « Yu Gothic », pas « UI ») | facteur 1,0, accents complets |
+| Shin Retro Maru Gothic (japonais arrondi) | M PLUS Rounded 1c Medium / Bold | Google Fonts |
+| Noto Sans KR (variable, un seul nom « Thin » pour toutes les graisses) | Noto Sans KR complète instanciée (fontTools `instancer`) en 300 / 700 ; faux italique des légendes : glyphes penchés de 11° (`TransformPen`) | voir pièges : gras invisible |
+| Mochiy Pop One (titres) | la même, complète | Google Fonts |
+| mincho d'un scan japonais (corps et titres) | Zen Old Mincho Regular / Bold | contient 【】※→ |
+| texte recomposé à neuf (scan froissé) | Segoe UI + Segoe UI Symbol (⌖ ①–④) + Bahnschrift (logo) | Windows |
+Polices téléchargées entières (plusieurs Mo, japonaises ou coréennes) : les réduire au latin + symboles utiles
+(fontTools `subset`) avant de les mettre dans `ff/`.
 
 Ces polices sont déjà dans le dossier `ff/` des jeux traduits (voir la colonne Polices de l'index `LISEZMOI.md`) : les
 copier plutôt que retélécharger.

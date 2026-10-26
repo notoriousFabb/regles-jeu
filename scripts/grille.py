@@ -1,20 +1,23 @@
 """Image d'une page avec une grille en points PDF, pour lire les coordonnées des zones de texte d'un scan.
-Usage : python -X utf8 grille.py livret.pdf page [x0,y0,x1,y1] [dpi=200] [pas=10]  -> grille<page>.png
-Sans zone : page entière. Avec une zone : agrandissement (pour lire un texte fin, prendre dpi=300 à 350).
+Usage : python -X utf8 grille.py livret.pdf page [x0,y0,x1,y1] [dpi] [pas=10]
+        -> grille<page>.png (page entière) ou grille<page>_<x0>_<y0>.png (zone : plusieurs zooms gardés)
+Sans dpi : choisi pour que l'image ne dépasse pas 1 200 pixels (au plus 200 dpi) — au-delà, une image coûte
+plus de jetons sans rien montrer de plus. Texte très fin dans une petite zone : dpi=300 à 350.
 Traits fins tous les <pas> points, traits marqués et numérotés tous les 5 pas ; origine en haut à gauche."""
 import pymupdf, sys
 
+MAX_PX = 1200
 doc = pymupdf.open(sys.argv[1])
 pno = int(sys.argv[2])
 args = sys.argv[3:]
 clip = None
 if args and "," in args[0]:
     clip = pymupdf.Rect([float(v) for v in args.pop(0).split(",")])
-dpi = int(args[0]) if args else 200
 step = float(args[1]) if len(args) > 1 else 10.0
 
 src = doc[pno]
 area = (clip or src.rect) & src.rect  # sinon une zone hors page décale la grille
+dpi = int(args[0]) if args else min(200, int(MAX_PX * 72 / max(area.width, area.height)))
 out = pymupdf.open()
 pg = out.new_page(width=area.width, height=area.height)
 pg.show_pdf_page(pg.rect, doc, pno, clip=area)
@@ -35,5 +38,7 @@ while y < area.y1:
     if major:
         pg.insert_text((0.5, y - area.y0 - 0.5), f"{y:g}", fontsize=fs, color=(0, 0, 0.8))
     y += step
-pg.get_pixmap(dpi=dpi).save(f"grille{pno}.png")
-print(f"grille{pno}.png  ({area})")
+nom = f"grille{pno}.png" if clip is None else f"grille{pno}_{area.x0:.0f}_{area.y0:.0f}.png"
+pix = pg.get_pixmap(dpi=dpi)
+pix.save(nom)
+print(f"{nom}  ({area}, {dpi} dpi, {pix.width}×{pix.height} px)")

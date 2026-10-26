@@ -1,13 +1,19 @@
 """Livre une traduction terminée : un seul appel pour toutes les étapes de rangement.
 Usage : python -X utf8 livrer.py "<Ludothèque>/_outils/<Jeu>" [--langue X] [--editeur Y] [--remplacer]
+        python -X utf8 livrer.py "<Ludothèque>/_outils/<Jeu>" --original "<livret>" --pdf "<français.pdf>"
+               [--pdf-en "<anglais.pdf>"] [--type "recréé (…)"] [--langue X] [--editeur Y] [--remplacer]
 
 1. crée <Ludothèque>/<Jeu>/ et y déplace le livret d'origine (s'il est encore dans « A traduire ») ;
 2. fait pointer SRC de spec.py sur son nouvel emplacement ;
 3. range et allège le dossier d'outils (ranger.py), reconstruit avec les polices allégées (build.py ou scan.py) ;
 4. copie la sortie en <Jeu>/<nom>_FR.pdf, mention de langue retirée (« Jeu_EN.pdf » → « Jeu_FR.pdf »,
    « Jeu ENG Rules.pdf » → « Jeu Rules_FR.pdf ») puis range de nouveau ;
+   spec bilingue (LANGUE lu dans l'environnement, textes X("fr", "en")) : construit aussi l'anglais
+   (LANGUE=en) et le copie en <Jeu>/<nom>_EN.pdf ;
 5. ajoute ou met à jour la ligne du jeu dans l'index _outils/LISEZMOI.md (langue et éditeur : options, sinon lus
    dans NOTES.md) et signale un NOTES.md manquant.
+Avec --pdf (traduction faite sans spec.py : page web recréée en HTML, livret recomposé à neuf…) : étapes 1, 4 et 5
+seulement, avec les PDF donnés (--pdf-en : version anglaise) et le Type donné à l'index (défaut « recréé »).
 N'écrase jamais un fichier existant dans le dossier du jeu sans --remplacer."""
 import ast, datetime, os, re, shutil, subprocess, sys
 
@@ -45,10 +51,74 @@ def opt(name):
     return sys.argv[sys.argv.index(name) + 1] if name in sys.argv else None
 
 
-def run(args, cwd):
+def run(args, cwd, langue=None):
+    env = dict(os.environ)
+    env.pop("LANGUE", None)
+    if langue:
+        env["LANGUE"] = langue
     r = subprocess.run([sys.executable, "-X", "utf8"] + args, cwd=cwd, capture_output=True, text=True,
-                       encoding="utf8")
+                       encoding="utf8", env=env)
     return r.returncode, (r.stdout + r.stderr).strip()
+
+
+def bilingue(spec_path):
+    """spec.py qui lit LANGUE dans l'environnement : version anglaise à construire aussi."""
+    return bool(re.search(r"environ(?:\.get)?\s*[\(\[]\s*[\"']LANGUE", open(spec_path, encoding="utf8").read()))
+
+
+def deplacer_original(src, target, replace):
+    os.makedirs(target, exist_ok=True)
+    dest = os.path.join(target, os.path.basename(src))
+    if os.path.normcase(os.path.dirname(src)) != os.path.normcase(target):
+        if os.path.exists(dest) and not replace:
+            fail(f"{dest} existe déjà — relancer avec --remplacer")
+        shutil.move(src, dest)
+        print(f"livret d'origine déplacé -> {dest}")
+    return dest
+
+
+def indexer(ludo, jeu, tools, typ):
+    notes = os.path.join(tools, "NOTES.md")
+    langue = opt("--langue") or from_notes(notes, "Langue d'origine") or "?"
+    editeur = opt("--editeur") or from_notes(notes, "Éditeur") or "?"
+    row = (f"| {jeu} | {langue} | {editeur} | {typ} | "
+           f"{font_families(os.path.join(tools, 'ff')) or '—'} | {datetime.date.today().isoformat()} |")
+    index = os.path.join(ludo, "_outils", "LISEZMOI.md")
+    text = open(index, encoding="utf8").read() if os.path.isfile(index) else HEADER
+    lines = text.rstrip("\n").split("\n")
+    rows = [i for i, l in enumerate(lines) if l.startswith(f"| {jeu} |")]
+    table = [i for i, l in enumerate(lines) if l.startswith("|")]
+    if rows:
+        lines[rows[0]] = row
+    elif table:  # new row right after the table's last row, not after the notes that follow it
+        lines.insert(table[-1] + 1, row)
+    else:
+        lines.append(row)
+    open(index, "w", encoding="utf8").write("\n".join(lines) + "\n")
+    print(f"index : {row}")
+    if not os.path.isfile(notes):
+        print(f"ATTENTION : {notes} manque — l'écrire (langue, éditeur, polices, vocabulaire, choix, compromis)")
+
+
+def livrer_pdf(tools, jeu, ludo, target, replace):
+    """Traduction faite sans spec.py : PDF donnés, original déplacé, index."""
+    src = os.path.abspath(opt("--original") or fail("--original \"<livret d'origine>\" manque"))
+    pdfs = {"FR": opt("--pdf"), "EN": opt("--pdf-en")}
+    if not os.path.isfile(src):
+        fail(f"livret d'origine introuvable : {src}")
+    stem = fr_stem(os.path.splitext(os.path.basename(src))[0])
+    for lg, f in pdfs.items():
+        if f and not os.path.isfile(f):
+            fail(f"PDF introuvable : {f}")
+        if f and os.path.exists(os.path.join(target, f"{stem}_{lg}.pdf")) and not replace:
+            fail(f"{os.path.join(target, f'{stem}_{lg}.pdf')} existe déjà — relancer avec --remplacer")
+    deplacer_original(src, target, replace)
+    for lg, f in pdfs.items():
+        if f:
+            shutil.copy(f, os.path.join(target, f"{stem}_{lg}.pdf"))
+            print(f"traduction -> {os.path.join(target, f'{stem}_{lg}.pdf')}")
+    typ = opt("--type") or "recréé"
+    indexer(ludo, jeu, tools, typ + (" (FR + EN)" if pdfs["EN"] else ""))
 
 
 def read_src(spec_path):
@@ -89,14 +159,17 @@ def main():
         sys.exit(__doc__)
     tools = os.path.abspath(sys.argv[1])
     spec_path = os.path.join(tools, "spec.py")
-    if not os.path.isfile(spec_path):
-        fail(f"{tools} n'est pas un dossier d'outils (pas de spec.py)")
     jeu = os.path.basename(tools)
     ludo = os.path.dirname(os.path.dirname(tools))
     target = os.path.join(ludo, jeu)
+    replace = "--remplacer" in sys.argv
+    if "--pdf" in sys.argv:
+        return livrer_pdf(tools, jeu, ludo, target, replace)
+    if not os.path.isfile(spec_path):
+        fail(f"{tools} n'est pas un dossier d'outils (pas de spec.py) — traduction faite autrement : --pdf")
     scan = os.path.isfile(os.path.join(tools, "scan.py")) and not os.path.isfile(os.path.join(tools, "build.py"))
     engine = "scan.py" if scan else "build.py"
-    replace = "--remplacer" in sys.argv
+    en = bilingue(spec_path)
 
     src, l0, l1 = read_src(spec_path)
     if not os.path.isfile(src):
@@ -104,17 +177,13 @@ def main():
     stem = os.path.splitext(os.path.basename(src))[0]
     fr_name = fr_stem(stem) + "_FR.pdf"
     fr_path = os.path.join(target, fr_name)
-    if os.path.exists(fr_path) and not replace:
-        fail(f"{fr_path} existe déjà — relancer avec --remplacer pour l'écraser")
+    en_path = os.path.join(target, fr_stem(stem) + "_EN.pdf")
+    for p in [fr_path] + ([en_path] if en else []):
+        if os.path.exists(p) and not replace:
+            fail(f"{p} existe déjà — relancer avec --remplacer pour l'écraser")
 
     # 1-2. dossier du jeu, livret d'origine, SRC
-    os.makedirs(target, exist_ok=True)
-    dest = os.path.join(target, os.path.basename(src))
-    if os.path.normcase(os.path.dirname(src)) != os.path.normcase(target):
-        if os.path.exists(dest) and not replace:
-            fail(f"{dest} existe déjà — relancer avec --remplacer")
-        shutil.move(src, dest)
-        print(f"livret d'origine déplacé -> {dest}")
+    dest = deplacer_original(src, target, replace)
     rel = os.path.relpath(dest, tools).replace("\\", "/").split("/")
     new = "SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), " + \
           ", ".join('"' + x + '"' for x in rel) + ")"
@@ -130,30 +199,19 @@ def main():
     tail = out[out.find("À VÉRIFIER"):] if "À VÉRIFIER" in out else ""
     shutil.copy(os.path.join(tools, "sortie.pdf"), fr_path)
     print(f"traduction -> {fr_path}")
+    if en:  # même spec, textes anglais : X("fr", "en") avec LANGUE=en
+        code, out = run([engine, "sortie_en.pdf"], tools, langue="en")
+        if code or "ERREUR" in out:
+            fail("la reconstruction anglaise a échoué :\n" + out[-2000:])
+        shutil.move(os.path.join(tools, "sortie_en.pdf"), en_path)
+        for f in ("sortie_en_journal.txt",):
+            if os.path.exists(os.path.join(tools, f)):
+                os.remove(os.path.join(tools, f))
+        print(f"version anglaise -> {en_path}")
     print(run(["ranger.py", tools], tools)[1].splitlines()[-1])
 
     # 5. index
-    notes = os.path.join(tools, "NOTES.md")
-    langue = opt("--langue") or from_notes(notes, "Langue d'origine") or "?"
-    editeur = opt("--editeur") or from_notes(notes, "Éditeur") or "?"
-    row = (f"| {jeu} | {langue} | {editeur} | {'scan' if scan else 'texte'} | "
-           f"{font_families(os.path.join(tools, 'ff'))} | {datetime.date.today().isoformat()} |")
-    index = os.path.join(ludo, "_outils", "LISEZMOI.md")
-    text = open(index, encoding="utf8").read() if os.path.isfile(index) else HEADER
-    lines = text.rstrip("\n").split("\n")
-    rows = [i for i, l in enumerate(lines) if l.startswith(f"| {jeu} |")]
-    table = [i for i, l in enumerate(lines) if l.startswith("|")]
-    if rows:
-        lines[rows[0]] = row
-    elif table:  # new row right after the table's last row, not after the notes that follow it
-        lines.insert(table[-1] + 1, row)
-    else:
-        lines.append(row)
-    text = "\n".join(lines) + "\n"
-    open(index, "w", encoding="utf8").write(text)
-    print(f"index : {row}")
-    if not os.path.isfile(notes):
-        print(f"ATTENTION : {notes} manque — l'écrire (langue, éditeur, polices, vocabulaire, choix, compromis)")
+    indexer(ludo, jeu, tools, ("scan" if scan else "texte") + (" (FR + EN)" if en else ""))
     if tail:
         print("\n" + tail)
 
