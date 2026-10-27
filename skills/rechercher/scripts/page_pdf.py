@@ -9,12 +9,16 @@
            sont téléchargées à part : certains sites (Google Sites) interdisent de les afficher ailleurs.
 --xpath : bloc(s) de chaque page qui contiennent les règles, dans une mise en page simple (noir sur blanc).
 --complet : la page entière, telle que le navigateur l'imprime.
+--garder DOSSIER (avec --fidele ou --xpath) : garde dans DOSSIER la page locale (page_1.html, page_2.html…) et
+           ses images (images/) ; la skill traduction-regles-jeu traduit ce HTML puis le remet en PDF avec la
+           même commande (adresse file:///…/page_1_fr.html à la place de l'URL).
 Dans tous les cas : aucun lien cliquable dans le PDF (sommaire compris) et pas de ligne « Source » ajoutée
 (le lien de la page est noté dans la note du jeu).
 Le navigateur (Chrome, sinon Edge) tourne en arrière-plan avec un profil temporaire : il ne touche pas à
 celui de l'utilisateur. À la fin, bilan caractères / images de la source et du PDF.
 """
-import argparse, mimetypes, os, re, shutil, subprocess, sys, tempfile, urllib.parse, urllib.request
+import argparse, base64, json, mimetypes, os, re, shutil, socket, subprocess, sys, tempfile, time
+import urllib.parse, urllib.request
 from pathlib import Path
 
 import lxml.html
@@ -64,11 +68,157 @@ def navigateur():
     sys.exit("ERREUR : ni Chrome ni Edge trouvé.")
 
 
+def dossier_travail():
+    """Dossier temporaire aux droits ordinaires. Sous Windows, tempfile.mkdtemp le réserve au seul utilisateur
+    (Python 3.12.4 et suivants) : les processus protégés du navigateur ne peuvent alors ni y lire la page à
+    imprimer ni y garder leur profil (PDF jamais écrit, page vide)."""
+    while True:
+        d = Path(tempfile.gettempdir()) / f"page_pdf_{os.urandom(4).hex()}"
+        try:
+            d.mkdir()
+            return d
+        except FileExistsError:
+            continue
+
+
 def lancer(nav, profil, args, timeout=120):
     cmd = [nav, "--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check",
            "--disable-extensions", f"--user-data-dir={profil}", "--virtual-time-budget=15000", *args]
+    pdf = next((Path(a.split("=", 1)[1]) for a in args if a.startswith("--print-to-pdf=")), None)
+    if pdf:
+        pdf.unlink(missing_ok=True)
     r = subprocess.run(cmd, capture_output=True, timeout=timeout)
+    # Chrome / Edge peuvent rendre la main tout de suite et finir en arrière-plan (constaté en 2026 sous
+    # Windows) : la page n'arrive plus sur la sortie (--dump-dom) et le PDF est écrit après coup.
+    if "--dump-dom" in args and not r.stdout.strip():
+        return dom_devtools(nav, profil, args[-1], timeout)
+    if pdf:
+        attendre_fichier(pdf, timeout)
     return r.stdout.decode("utf-8", "replace")
+
+
+def attendre_fichier(f, timeout):
+    """Attend que le fichier existe et que sa taille ne bouge plus (écriture terminée)."""
+    taille, debut = -1, time.time()
+    while time.time() - debut < timeout:
+        t = f.stat().st_size if f.exists() else -1
+        if t > 0 and t == taille:
+            return
+        taille = t
+        time.sleep(0.5)
+
+
+class _WebSocket:
+    """Client WebSocket minimal (bibliothèque standard) pour le protocole DevTools du navigateur."""
+
+    def __init__(self, url):
+        u = urllib.parse.urlparse(url)
+        self.s = socket.create_connection((u.hostname, u.port), timeout=60)
+        cle = base64.b64encode(os.urandom(16)).decode()
+        self.s.sendall(f"GET {u.path} HTTP/1.1\r\nHost: {u.netloc}\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n"
+                       f"Sec-WebSocket-Key: {cle}\r\nSec-WebSocket-Version: 13\r\n\r\n".encode())
+        rep = b""
+        while b"\r\n\r\n" not in rep:
+            bloc = self.s.recv(4096)
+            if not bloc:
+                raise OSError("DevTools : connexion refusée")
+            rep += bloc
+        if b" 101 " not in rep.split(b"\r\n", 1)[0]:
+            raise OSError("DevTools : " + rep.split(b"\r\n", 1)[0].decode("latin-1"))
+        self.buf, self.n = rep.split(b"\r\n\r\n", 1)[1], 0
+
+    def _lire(self, n):
+        while len(self.buf) < n:
+            bloc = self.s.recv(65536)
+            if not bloc:
+                raise OSError("DevTools : connexion fermée")
+            self.buf += bloc
+        d, self.buf = self.buf[:n], self.buf[n:]
+        return d
+
+    def _envoyer(self, texte):
+        data, masque = texte.encode(), os.urandom(4)
+        n = len(data)
+        if n < 126:
+            tete = bytes([0x81, 0x80 | n])
+        elif n < 65536:
+            tete = bytes([0x81, 0x80 | 126]) + n.to_bytes(2, "big")
+        else:
+            tete = bytes([0x81, 0x80 | 127]) + n.to_bytes(8, "big")
+        self.s.sendall(tete + masque + bytes(b ^ masque[i % 4] for i, b in enumerate(data)))
+
+    def _message(self):
+        morceaux = []
+        while True:
+            b0, b1 = self._lire(2)
+            n = b1 & 0x7F
+            if n == 126:
+                n = int.from_bytes(self._lire(2), "big")
+            elif n == 127:
+                n = int.from_bytes(self._lire(8), "big")
+            data, op = self._lire(n), b0 & 0x0F
+            if op == 8:
+                raise OSError("DevTools : connexion fermée")
+            if op in (9, 10):  # ping / pong
+                continue
+            morceaux.append(data)
+            if b0 & 0x80:
+                return b"".join(morceaux).decode("utf-8", "replace")
+
+    def appel(self, methode, **params):
+        self.n += 1
+        self._envoyer(json.dumps({"id": self.n, "method": methode, "params": params}))
+        while True:
+            m = json.loads(self._message())
+            if m.get("id") == self.n:
+                if "error" in m:
+                    raise OSError(f"DevTools {methode} : {m['error'].get('message')}")
+                return m.get("result", {})
+
+
+def dom_devtools(nav, profil, url, timeout=120):
+    """DOM de la page lu par le protocole DevTools (quand --dump-dom ne renvoie rien) ; "" en cas d'échec."""
+    # profil à part : le navigateur lancé par --dump-dom tourne peut-être encore sur le profil habituel, et un
+    # second navigateur sur le même profil lui confierait la page puis s'arrêterait aussitôt
+    profil = f"{profil}_devtools"
+    fichier = Path(profil) / "DevToolsActivePort"
+    fichier.unlink(missing_ok=True)
+    # Windows : processus détaché, sinon le navigateur s'arrête avant d'ouvrir le port DevTools
+    detache = subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0
+    subprocess.Popen([nav, "--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check",
+                      "--disable-extensions", f"--user-data-dir={profil}", "--remote-debugging-port=0",
+                      "about:blank"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=detache)
+    debut = time.time()
+    while not (fichier.exists() and len(fichier.read_text().split()) >= 2):
+        if time.time() - debut > 30:
+            return ""
+        time.sleep(0.2)
+    port, chemin = fichier.read_text().split()[:2]
+    navig = None
+    try:
+        navig = _WebSocket(f"ws://127.0.0.1:{port}{chemin}")
+        cible = navig.appel("Target.createTarget", url=url)["targetId"]
+        onglet = _WebSocket(f"ws://127.0.0.1:{port}/devtools/page/{cible}")
+        # l'onglet commence sur une page vide déjà « complete » : attendre la page demandée, chargée
+        while time.time() - debut < timeout:
+            etat = onglet.appel("Runtime.evaluate", returnByValue=True,
+                                expression="location.href != 'about:blank' && document.readyState == 'complete'")
+            if etat.get("result", {}).get("value") is True:
+                break
+            time.sleep(0.5)
+        time.sleep(3)  # scripts lancés après le chargement (comme --virtual-time-budget)
+        html = onglet.appel("Runtime.evaluate", expression="document.documentElement.outerHTML",
+                            returnByValue=True)["result"].get("value", "")
+        return "<!DOCTYPE html>\n" + html if html else ""
+    except (OSError, KeyError, ValueError):
+        return ""
+    finally:
+        if navig:
+            try:
+                navig.appel("Browser.close")
+            except OSError:
+                pass
+        time.sleep(1)  # le temps que le navigateur libère son profil
 
 
 def compter(texte):
@@ -145,7 +295,7 @@ def epingles(doc):
     return regles
 
 
-def fidele(nav, profil, url, travail, images, largeur):
+def fidele(nav, profil, url, travail, images, largeur, copie=None):
     """Page entière avec sa mise en page, enregistrée en HTML local ; renvoie (fichier, caractères, images)."""
     dom = lancer(nav, profil, ["--dump-dom", url])
     if not dom.strip():
@@ -165,7 +315,8 @@ def fidele(nav, profil, url, travail, images, largeur):
     for el in doc.xpath("//*[contains(translate(text(),'COKIE','cokie'),'cookie')]"):
         for anc in el.iterancestors():
             if fixes & set((anc.get("class") or "").split()) or "fixed" in (anc.get("style") or ""):
-                anc.drop_tree()
+                if anc.getparent() is not None:  # bannière déjà retirée (plusieurs textes « cookie » dedans)
+                    anc.drop_tree()
                 break
     for el in doc.xpath("//*[contains(@style,'fixed') or contains(@style,'sticky')]"):
         el.set("style", re.sub(r"position\s*:\s*(fixed|sticky)", "position: absolute", el.get("style")))
@@ -189,6 +340,8 @@ def fidele(nav, profil, url, travail, images, largeur):
     if tete is None:
         tete = lxml.html.Element("head")
         doc.insert(0, tete)
+    if copie:  # --garder : page locale, sans les réglages d'impression (ils sont reposés à chaque impression)
+        copie.write_text("<!doctype html>" + lxml.html.tostring(doc, encoding="unicode"), encoding="utf-8")
     st = lxml.html.Element("style")
     st.text = deplier + "/*FIDELE*/"  # réglages d'impression, posés par imprimer_fidele()
     tete.append(st)
@@ -274,18 +427,23 @@ def main():
     g.add_argument("--complet", action="store_true")
     ap.add_argument("--largeur", type=int, default=1280)
     ap.add_argument("--titre", default="")
+    ap.add_argument("--garder")
     a = ap.parse_args()
 
     nav = navigateur()
     sortie = Path(a.sortie).resolve()
-    travail = Path(tempfile.mkdtemp(prefix="page_pdf_"))
+    travail = dossier_travail()
     profil = travail / "profil"
-    images = Images(travail / "images")
+    garder = Path(a.garder).resolve() if a.garder else None
+    if garder:
+        garder.mkdir(parents=True, exist_ok=True)
+    images = Images((garder or travail) / "images")
     try:
         if a.fidele:
             d, n_txt, n_img = pymupdf.open(), 0, 0
             for i, url in enumerate(a.urls):
-                page, t, im = fidele(nav, profil, url, travail, images, a.largeur)
+                page, t, im = fidele(nav, profil, url, travail, images, a.largeur,
+                                     garder / f"page_{i + 1}.html" if garder else None)
                 n_txt, n_img = n_txt + t, n_img + im
                 d.insert_pdf(imprimer_fidele(nav, profil, page, travail / f"partie_{i + 1}.pdf", a.largeur))
             for p in d:  # numéro de page discret, en bas au centre
@@ -312,7 +470,9 @@ def main():
                     sys.exit(f"ERREUR : page vide ou inaccessible : {url}")
                 doc = lxml.html.fromstring(dom, base_url=url)
                 doc.make_links_absolute(url)
-                trouves = doc.xpath(a.xpath)
+                # page gardée par --garder (déjà réduite aux blocs) : reprise telle quelle, l'XPath ne s'y applique plus
+                garde = doc.xpath("//meta[@name='page_pdf-garder']")
+                trouves = doc.xpath("//body/div[@class='page']") if garde else doc.xpath(a.xpath)
                 if not trouves:
                     sys.exit(f"ERREUR : l'XPath ne trouve rien sur {url}")
                 html = []
@@ -323,11 +483,15 @@ def main():
                     n_txt += compter(el.text_content())
                     n_img += len(el.xpath(".//img[@src]"))
                     html.append(lxml.html.tostring(el, encoding="unicode"))
-                blocs.append(f'<div class="page">{"".join(html)}</div>')
+                blocs.append("".join(html) if garde else f'<div class="page">{"".join(html)}</div>')
             titre = f"<title>{a.titre}</title>" if a.titre else ""
             page = travail / "regles.html"
             page.write_text(f'<!doctype html><html><head><meta charset="utf-8">{titre}<style>{CSS}</style>'
                             f'</head><body>{"".join(blocs)}</body></html>', encoding="utf-8")
+            if garder:  # repérée à la relecture par sa balise : l'XPath d'origine n'y trouverait plus rien
+                (garder / "page_1.html").write_text(page.read_text(encoding="utf-8").replace(
+                    '<meta charset="utf-8">', '<meta charset="utf-8"><meta name="page_pdf-garder">', 1),
+                    encoding="utf-8")
             lancer(nav, profil, [f"--print-to-pdf={sortie}", "--no-pdf-header-footer", page.as_uri()])
 
         if not sortie.exists():
