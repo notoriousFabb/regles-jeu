@@ -56,6 +56,8 @@ flowchart LR
 - Conserve la mise en page : polices de remplacement choisies et mesurées, accents complets, icônes dans le texte.
 - Gère les livrets **scannés** : lecture automatique, puis texte traduit posé sur le scan, ou livret recomposé à neuf
   pour un scan froissé.
+- Produit à la demande une **version économe en encre** d'un livret à fond sombre : même mise en page, fond blanc,
+  texte foncé, illustrations intactes — livrée à côté du livret normal, qui reste la référence.
 - Contrôles automatiques (débordements, texte oublié, orthographe) et relecture par deux agents dédiés.
 - Range le résultat à côté de l'original et tient à jour l'index de la ludothèque.
 
@@ -138,6 +140,7 @@ Les skills se déclenchent seules d'après votre demande ; les commandes directe
 | « Traduis-moi ce livret : MonJeu_rules.pdf » | traduction en français, relecture, rangement |
 | « Traduis-le en français et en anglais » | les deux versions, `_FR.pdf` et `_EN.pdf` |
 | « Dans Merge Take, remplace "la plus forte" par "de plus haute valeur" » | correction d'une traduction déjà livrée |
+| « Ce livret est tout noir, je vais l'imprimer » | version économe en encre, en plus du livret normal |
 
 Exemple réel :
 > **Vous** : /regles-jeu:rechercher Hyakuju Parade
@@ -216,6 +219,7 @@ Les changements de chaque version sont dans le [CHANGELOG](CHANGELOG.md).
 | Les relecteurs ne sont pas trouvés | ouvrir une nouvelle session ou taper `/reload-plugins` ; vérifier `claude plugin details regles-jeu` |
 | `ModuleNotFoundError: pymupdf` (ou `fontTools`, `lxml`) | relancer `pip install pymupdf fonttools lxml` avec le Python utilisé par Claude (noter son chemin dans le `CLAUDE.md` de la ludothèque) |
 | BoardGameGeek refuse la lecture | installer l'extension Claude in Chrome |
+| La version économe en encre garde des zones sombres | lire le journal : fond posé avec une matrice tournée (« À VÉRIFIER ») ou couleurs en ton direct, laissées intactes ; un livret scanné n'est pas couvert |
 | Scan japonais non lu automatiquement | installer le module de lecture du japonais : [prérequis de traduire](skills/traduire/README.md#installation) |
 | Anciennes skills `recherche-regles-jeu` / `traduction-regles-jeu` encore présentes | les supprimer de `~/.claude/skills/` : le plugin les remplace |
 
@@ -226,6 +230,8 @@ Les changements de chaque version sont dans le [CHANGELOG](CHANGELOG.md).
 - Le français prend 1,5 à 2 fois plus de place que le japonais : traduction plus concise, police réduite, signalées.
 - Fichiers Google Drive en lecture seule : récupérés seulement en images, avec votre accord.
 - Testé sous Windows ; la lecture automatique des scans est propre à Windows.
+- Version économe en encre : pour les livrets à texte et les livrets recomposés, pas pour les scans (le fond y est
+  l'image scannée elle-même).
 
 Listes complètes : [rechercher](skills/rechercher/README.md#limites-connues) ·
 [traduire](skills/traduire/README.md#limites-connues).
