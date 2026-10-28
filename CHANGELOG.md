@@ -3,6 +3,14 @@
 Toutes les évolutions notables du plugin. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 numérotation [sémantique](https://semver.org/lang/fr/).
 
+## [1.3.0] — 2026-10-28
+### Ajouté
+- Aide-mémoire d'une page d'un jeu, à la demande (skill `traduire`) : Claude résume en français, d'après le texte
+  du livret, le but, la mise en place, le tour de jeu, la fin de manche et le score, la fin de partie et les pièges,
+  dans `_outils/<Jeu>/aide-memoire.json` ; `aide_memoire.py` (nouveau) en fait une page A4 sur deux colonnes, la
+  couverture du livret en vignette, texte réduit pas à pas pour tenir sur la page, rangée en
+  `<Jeu>/<nom>_aide-memoire.pdf`. Documentation : `skills/traduire/references/aide-memoire.md`.
+
 ## [1.2.0] — 2026-10-28
 ### Ajouté
 - Version allégée d'un livret pour Discord (10 Mo) : `livrer.py` signale tout livret livré qui atteint 10 Mo,
