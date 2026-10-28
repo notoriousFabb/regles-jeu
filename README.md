@@ -56,6 +56,8 @@ flowchart LR
 - Conserve la mise en page : polices de remplacement choisies et mesurées, accents complets, icônes dans le texte.
 - Gère les livrets **scannés** : lecture automatique, puis texte traduit posé sur le scan, ou livret recomposé à neuf
   pour un scan froissé.
+- Signale un livret d'au moins **10 Mo** (limite Discord) et propose alors une **version allégée**, le livret en
+  pleine qualité restant intact.
 - Produit à la demande une **version économe en encre** d'un livret à fond sombre : même mise en page, fond blanc,
   texte foncé, illustrations intactes — livrée à côté du livret normal, qui reste la référence.
 - Contrôles automatiques (débordements, texte oublié, orthographe) et relecture par deux agents dédiés.
@@ -141,6 +143,7 @@ Les skills se déclenchent seules d'après votre demande ; les commandes directe
 | « Traduis-le en français et en anglais » | les deux versions, `_FR.pdf` et `_EN.pdf` |
 | « Dans Merge Take, remplace "la plus forte" par "de plus haute valeur" » | correction d'une traduction déjà livrée |
 | « Ce livret est tout noir, je vais l'imprimer » | version économe en encre, en plus du livret normal |
+| « Il est trop lourd pour Discord » | version allégée sous 10 Mo, le livret d'origine étant conservé |
 
 Exemple réel :
 > **Vous** : /regles-jeu:rechercher Hyakuju Parade
@@ -219,6 +222,7 @@ Les changements de chaque version sont dans le [CHANGELOG](CHANGELOG.md).
 | Les relecteurs ne sont pas trouvés | ouvrir une nouvelle session ou taper `/reload-plugins` ; vérifier `claude plugin details regles-jeu` |
 | `ModuleNotFoundError: pymupdf` (ou `fontTools`, `lxml`) | relancer `pip install pymupdf fonttools lxml` avec le Python utilisé par Claude (noter son chemin dans le `CLAUDE.md` de la ludothèque) |
 | BoardGameGeek refuse la lecture | installer l'extension Claude in Chrome |
+| La version allégée reste au-dessus de 10 Mo | livret presque entièrement fait de grandes images : l'envoyer en deux fichiers (deux moitiés de pages) |
 | La version économe en encre garde des zones sombres | lire le journal : fond posé avec une matrice tournée (« À VÉRIFIER ») ou couleurs en ton direct, laissées intactes ; un livret scanné n'est pas couvert |
 | Scan japonais non lu automatiquement | installer le module de lecture du japonais : [prérequis de traduire](skills/traduire/README.md#installation) |
 | Anciennes skills `recherche-regles-jeu` / `traduction-regles-jeu` encore présentes | les supprimer de `~/.claude/skills/` : le plugin les remplace |

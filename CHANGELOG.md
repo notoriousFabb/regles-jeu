@@ -3,6 +3,13 @@
 Toutes les évolutions notables du plugin. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 numérotation [sémantique](https://semver.org/lang/fr/).
 
+## [1.2.0] — 2026-10-28
+### Ajouté
+- Version allégée d'un livret pour Discord (10 Mo) : `livrer.py` signale tout livret livré qui atteint 10 Mo,
+  et `comprimer.py` (nouveau) écrit `<nom>_light.pdf` à côté du livret, qui reste intact en pleine qualité.
+  Essais du plus doux au plus serré, arrêtés au premier qui passe ; le texte, vectoriel, n'est pas touché et
+  l'égalité du texte est vérifiée après coup. Documentation : `skills/traduire/references/alleger.md`.
+
 ## [1.1.0] — 2026-10-27
 ### Ajouté
 - Version économe en encre d'un livret à fond sombre, à la demande de l'utilisateur : `build.py --fond-clair`
