@@ -15,7 +15,8 @@ FLOWS : chaque flux = paragraphes posés de haut en bas sur une page, en gardant
 CARDS / CARD_PAGES / CARD_STYLE (facultatif) : textes imprimés sur les mini-cartes illustrées (voir en bas).
 AVANT_TEXTE (facultatif) : fonction (page, pno, log) appelée après l'effacement du texte d'origine et avant
   le français, pour dessiner dessous : redessiner plus large le rectangle arrondi d'un titre devenu trop long
-  (même couleur, retrouvé avec page.get_drawings()), recouvrir un drapeau par un autre…
+  (même couleur, retrouvé avec page.get_drawings()), recouvrir un drapeau par un autre… Appelée seulement pour les
+  pages qui ont un flux (ou une entrée INCLINEES / CONTOURS) : pour une page sans flux, `CONTOURS = {page: []}`.
 IGNORE (facultatif) : lignes volontairement non traduites, pour que le rapport « texte non traduit » ne les liste pas.
 INCLINEES (facultatif) : étiquettes penchées, [(page, "texte exact de la ligne", "français")] : reposées au même
   angle, même couleur et même police (references/pieges.md).

@@ -25,7 +25,7 @@ jeu dans `_outils/<Jeu>/NOTES.md`. Scripts : `scripts/` ; `preparer.py` copie ce
 
 ## Quel livret traduire
 Chemin donné : l'utiliser ; sinon le dossier de dépôt. **Plusieurs PDF** : les lister (regrouper ceux d'un même
-jeu), coût estimé ~150-200 k jetons par livret, demander : tout un par un, ou un livret précis ? Rien avant la
+jeu), coût estimé ≈ 0,5 % du quota des 5 h par page (mesuré : 40 pages ≈ 21 %), demander : tout un par un, ou un livret précis ? Rien avant la
 réponse. Tout : un livret à la fois, sans parallélisme (index commun), court bilan après chacun, puis enchaîner ;
 un livret à problème est mis de côté et signalé.
 
@@ -78,10 +78,20 @@ pièges), d'après le texte du livret, rangée en `<Jeu>/<nom>_aide-memoire.pdf`
 Jamais d'office ; après une traduction, ne pas la proposer à chaque fois.
 
 ## Économiser les jetons
+Tout ce qui entre dans la conversation est relu à chaque action suivante : un fichier lu au début coûte autant de
+fois qu'il reste d'actions. D'où :
 - Images : une planche à 70-80 dpi pour voir, puis seulement des **zooms sur une zone** (`clip=`) pour vérifier ;
   jamais une page entière à plus de 110 dpi ; pas de nouvelle vue de toute la page après une petite correction.
+  **Pas de vue d'ensemble du français** (pages construites, côte à côte) : c'est le travail du relecteur visuel ;
+  ici, seulement des zooms sur les zones modifiées ou signalées par le journal ou les rapports.
 - Texte : lire `blocks.txt` / `zones.py` / les journaux plutôt que des images ; filtrer les journaux (`grep`
-  DÉBORDE, ERREUR, VÉRIFIER) ; index et notes : `grep`, pas de lecture intégrale.
+  DÉBORDE, ERREUR, VÉRIFIER) ; index et notes : `grep`, pas de lecture intégrale. **Ne pas lire `texte_fr.txt`**
+  (le relecteur texte le lit) : vérifier un point de son rapport par `grep`.
+- Moteur : ne pas lire `build.py` ni les autres scripts. Tout ce que le spec règle est dans l'en-tête du modèle
+  (`spec_modele.py`, recopié en tête de `spec.py`) et dans `references/pieges.md` ; si un réglage manque vraiment,
+  un `grep -n` ciblé, pas de lecture de passages entiers.
+- Constructions : corriger **tous** les points d'un journal avant de reconstruire ; construction et filtre du
+  journal dans une seule commande. Viser 3-4 constructions par livret, pas une par correction.
 - Spec : écrit d'un seul coup, puis retouches ciblées avec l'outil d'édition (pas de réécriture complète).
 - Agents : seulement pour la relecture (étape 5) ; tout le reste ici.
 
