@@ -38,6 +38,8 @@ Termes généraux, réutilisables d'un jeu à l'autre. Le vocabulaire propre à 
 | Must-Not-Follow | interdit de suivre |
 | may follow (JP メイフォロー) | fournir facultatif |
 | bid (JP ビッド) | annonce |
+| minor / major / super trump, no-trump | atout mineur / atout majeur / super-atout, sans-atout |
+| display (cartes révélées devant soi) | exposer / exposition, cartes exposées |
 
 ## Équivalences dans d'autres langues
 Termes de base des jeux de plis ; renvoient au français du tableau ci-dessus. Compléter à chaque jeu.
