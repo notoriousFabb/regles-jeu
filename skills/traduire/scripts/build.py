@@ -596,7 +596,8 @@ def draw_tilted(page, todo, log):
         ff = os.path.join(FF, face_file(*fcode(s)))
         font = pymupdf.Font(fontfile=ff)
         size = s["size"]
-        w_en = pymupdf.Rect(l["bbox"]).width / max(abs(c), 0.5)
+        bb = pymupdf.Rect(l["bbox"])  # length along the text direction (vertical labels: the height)
+        w_en = bb.width / abs(c) if abs(c) >= abs(sn) else bb.height / abs(sn)
         w_fr = font.text_length(fr, size)
         if w_fr > w_en * 1.2:
             size *= w_en * 1.2 / w_fr
