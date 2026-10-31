@@ -3,6 +3,13 @@
 Toutes les évolutions notables du plugin. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 numérotation [sémantique](https://semver.org/lang/fr/).
 
+## [1.4.0] — 2026-11-01
+### Modifié
+- Aide-mémoire sur deux pages quand une seule ne suffit pas : plutôt que de réduire le texte sous 8,5 pt,
+  `aide_memoire.py` le pose sur deux pages A4 à imprimer en recto-verso (la seconde rappelle le titre, pages
+  numérotées « 1 / 2 », aperçu de la 2e page en `<aperçu>-2.png`) ; `--une-page` garde l'ancien comportement.
+  Rédaction : 350 à 500 mots pour une page, jusqu'à 900 pour un jeu riche.
+
 ## [1.3.0] — 2026-10-28
 ### Ajouté
 - Aide-mémoire d'une page d'un jeu, à la demande (skill `traduire`) : Claude résume en français, d'après le texte

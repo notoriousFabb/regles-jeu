@@ -1,6 +1,6 @@
 ---
 name: traduire
-description: Traduit en français (et en anglais si demandé) un livret de règles de jeu de société en PDF, depuis n'importe quelle langue, en conservant la mise en page — polices, images, icônes, tableaux, positions — et produit un `*_FR.pdf` ; gère aussi les livrets scannés. À utiliser dès que l'utilisateur demande de traduire des règles, un livret, un rulebook ou un PDF de jeu (même « traduis-moi ce PDF » ou un nom comme `xxx_rulebook.pdf`, `Spielregel.pdf`), ou de corriger une traduction déjà faite ainsi. Fait aussi, à la demande, l'aide-mémoire d'une page d'un jeu (mise en place, tour de jeu, score) à poser sur la table.
+description: Traduit en français (et en anglais si demandé) un livret de règles de jeu de société en PDF, depuis n'importe quelle langue, en conservant la mise en page — polices, images, icônes, tableaux, positions — et produit un `*_FR.pdf` ; gère aussi les livrets scannés. À utiliser dès que l'utilisateur demande de traduire des règles, un livret, un rulebook ou un PDF de jeu (même « traduis-moi ce PDF » ou un nom comme `xxx_rulebook.pdf`, `Spielregel.pdf`), ou de corriger une traduction déjà faite ainsi. Fait aussi, à la demande, l'aide-mémoire d'un jeu (mise en place, tour de jeu, score) à poser sur la table, sur une page (deux au besoin).
 ---
 
 # Traduction de livrets de règles (toutes langues → FR, mise en page conservée)
@@ -72,8 +72,8 @@ un livret à problème est mis de côté et signalé.
    - **Livret d'au moins 10 Mo** (`livrer.py` le signale) : proposer une version allégée pour Discord, jamais
      la faire d'office — `references/alleger.md` ; le livret en pleine qualité est gardé tel quel.
 
-## Aide-mémoire d'une page (à la demande)
-« Fais l'aide-mémoire de <jeu> » : une page A4 en français (mise en place, tour de jeu, fin de partie et score,
+## Aide-mémoire (à la demande)
+« Fais l'aide-mémoire de <jeu> » : une page A4 en français, deux en recto-verso si le jeu le demande (mise en place, tour de jeu, fin de partie et score,
 pièges), d'après le texte du livret, rangée en `<Jeu>/<nom>_aide-memoire.pdf` — `references/aide-memoire.md`.
 Jamais d'office ; après une traduction, ne pas la proposer à chaque fois.
 

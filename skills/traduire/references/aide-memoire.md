@@ -1,6 +1,6 @@
-# Aide-mémoire d'une page
+# Aide-mémoire (une page, deux au besoin)
 
-Une page A4 à poser sur la table pendant la partie : mise en place, déroulement d'un tour, fin de partie et
+Une page A4 à poser sur la table pendant la partie (deux, en recto-verso, quand le jeu le demande) : mise en place, déroulement d'un tour, fin de partie et
 score, points qu'on oublie. **À la demande seulement**, jamais d'office : pour un jeu déjà traduit, un jeu
 livré en français, ou juste après une traduction si l'utilisateur le demande. Toujours **en français**, quelle
 que soit la langue du livret.
@@ -26,8 +26,10 @@ Format dans l'en-tête de `scripts/aide_memoire.py`. Sections habituelles, dans 
 Règles d'écriture :
 - **Rien d'inventé** : chaque phrase vient du livret. Une règle ambiguë ou absente n'y entre pas (la signaler).
 - Phrases courtes à l'infinitif ou à l'impératif, chiffres en chiffres ; une idée par ligne.
-- **350 à 500 mots** en tout : au-delà, le texte devient petit. Garder ce qui sert pendant la partie ; laisser
-  l'ambiance, le matériel détaillé, les exemples longs, les variantes (une ligne au plus pour une variante).
+- **350 à 500 mots** pour une page. Un jeu riche (nombreuses cartes à effet, plusieurs phases, barème détaillé)
+  peut aller **jusqu'à 900 mots** : l'aide-mémoire passe alors sur deux pages, à imprimer en recto-verso. Ne pas
+  allonger pour remplir : garder ce qui sert pendant la partie ; laisser l'ambiance, le matériel détaillé, les
+  exemples longs, les variantes (une ligne au plus pour une variante).
 - `**gras**` pour les mots-clés qu'on cherche des yeux (nombres de cartes, conditions de victoire, interdits).
 - Vocabulaire de `references/glossaire.md` et de la traduction du jeu ; noms de cartes et de variantes comme dans
   le livret français (préférences de l'utilisateur).
@@ -40,12 +42,14 @@ python -X utf8 <skill>/scripts/aide_memoire.py "<Ludothèque>/_outils/<Jeu>/aide
     "<Ludothèque>/<Jeu>/<nom>_aide-memoire.pdf" --livret "<livret d'origine.pdf>" --apercu "<scratchpad>/am.png"
 ```
 - `--livret` : la couverture (page 1) en vignette dans l'en-tête — le livret d'origine, reconnaissable sur la table.
-- Le texte est réduit pas à pas pour tenir sur la page ; le journal donne la taille retenue. Sous 8,5 pt
-  (« petit : envisager de raccourcir ») ou « TROP LONG » : raccourcir le JSON, pas les marges.
-- Regarder **une fois** l'aperçu à 80 dpi : sections dans l'ordre, rien de coupé ; puis des zooms seulement là
-  où un doute reste. Corrections : dans le JSON, puis reconstruire.
+- Le texte est réduit pas à pas pour tenir sur une page, sans descendre sous 8,5 pt ; sinon l'aide-mémoire passe
+  sur **deux pages** (la 2e rappelle le titre, pages numérotées), avec un texte plus grand. Le journal donne la
+  taille et le nombre de pages. « TROP LONG » (même deux pages en 7 pt) : raccourcir le JSON, pas les marges.
+  `--une-page` interdit la 2e page (texte réduit jusqu'à 7 pt), si l'utilisateur la refuse.
+- Regarder **une fois** l'aperçu à 80 dpi (`am.png`, et `am-2.png` pour une 2e page) : sections dans l'ordre, rien
+  de coupé ; puis des zooms seulement là où un doute reste. Corrections : dans le JSON, puis reconstruire.
 
 `<nom>` : celui du livret français (`CMYK_Rules` pour `CMYK_Rules_FR.pdf`), suffixe `_aide-memoire.pdf`, rangé
 avec les livrets du jeu. L'app de la ludothèque le reconnaît à ce suffixe et l'ouvre depuis la fiche du jeu.
-Ajouter une ligne « Aide-mémoire : fait le <date> » à la fin de `NOTES.md` avec l'outil d'édition (pas `printf` ni `echo`). Résumer à l'utilisateur : fichier, taille du
-texte, ce qui a été laissé de côté.
+Ajouter une ligne « Aide-mémoire : fait le <date> » à la fin de `NOTES.md` avec l'outil d'édition (pas `printf` ni `echo`). Résumer à l'utilisateur : fichier, nombre
+de pages (deux : à imprimer en recto-verso), taille du texte, ce qui a été laissé de côté.

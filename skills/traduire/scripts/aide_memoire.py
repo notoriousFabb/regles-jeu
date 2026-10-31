@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Aide-mémoire d'une page A4 à poser sur la table : mise en place, tour de jeu, fin de partie et score…
+"""Aide-mémoire A4 à poser sur la table (une page, deux au besoin) : mise en place, tour de jeu, fin de partie et
+score…
 
     python -X utf8 aide_memoire.py "<Ludothèque>/_outils/<Jeu>/aide-memoire.json" "<sortie.pdf>"
         [--livret "<livret.pdf>"]   vignette de la couverture (page 1) en tête de page
-        [--apercu "<image.png>"]    image de la page construite, pour la regarder
+        [--apercu "<image.png>"]    image de la page construite (la 2e page, s'il y en a une : <image>-2.png)
+        [--une-page]                jamais de 2e page (texte réduit jusqu'à 7 pt)
 
 aide-memoire.json (rédigé par Claude d'après le livret, voir references/aide-memoire.md) :
     {
@@ -20,15 +22,17 @@ aide-memoire.json (rédigé par Claude d'après le livret, voir references/aide-
       "source": "Livret CMYK_Rules_FR.pdf, p. 2-5"
     }
 Dans les textes, **gras** met en gras. Les sections se suivent dans l'ordre, sur deux colonnes ; le texte est
-réduit pas à pas jusqu'à tenir sur une page (« TROP LONG » en dessous de 7 pt : raccourcir le JSON).
+réduit pas à pas jusqu'à tenir sur une page sans descendre sous 8,5 pt. Sinon l'aide-mémoire passe sur deux pages
+(recto-verso), avec un texte plus grand (« TROP LONG » si même deux pages en 7 pt ne suffisent pas : raccourcir le
+JSON).
 """
 import html, io, json, os, re, sys
 
 import pymupdf
 
 A4 = pymupdf.paper_rect("a4")
-MARGE, ENTRE_COLONNES, HAUT_TETE = 34, 22, 92
-TAILLE_MIN = 7.0
+MARGE, ENTRE_COLONNES, HAUT_TETE, HAUT_SUITE = 34, 22, 92, 30
+TAILLE_MIN, PETIT = 7.0, 8.5  # PETIT : en dessous, une 2e page vaut mieux qu'un texte qu'on lit mal
 POLICES = {  # polices de Windows ; à défaut, celles intégrées à pymupdf
     "corps": ("segoeui.ttf", "segoeuib.ttf", "segoeuii.ttf"),
     "titre": ("georgia.ttf", "georgiab.ttf", None),
@@ -87,51 +91,64 @@ def _css(polices, corps, titre, taille):
     """
 
 
-def _colonnes():
+def _colonnes(pages):
+    """Colonnes à remplir dans l'ordre : deux par page ; la 1re page sous l'en-tête, la 2e sous son rappel du titre."""
     largeur = (A4.width - 2 * MARGE - ENTRE_COLONNES) / 2
-    haut, bas = MARGE + HAUT_TETE, A4.height - MARGE - 16
-    return [pymupdf.Rect(MARGE, haut, MARGE + largeur, bas),
-            pymupdf.Rect(MARGE + largeur + ENTRE_COLONNES, haut, A4.width - MARGE, bas)]
+    bas, cols = A4.height - MARGE - 16, []
+    for p in range(pages):
+        haut = MARGE + (HAUT_TETE if p == 0 else HAUT_SUITE)
+        cols += [(p, pymupdf.Rect(MARGE, haut, MARGE + largeur, bas)),
+                 (p, pymupdf.Rect(MARGE + largeur + ENTRE_COLONNES, haut, A4.width - MARGE, bas))]
+    return cols
 
 
-def _poser(sections, taille, css, archive, dev):
+def _poser(sections, taille, css, archive, w, dev, pages):
     """Pose les sections l'une sous l'autre sur deux colonnes, chacune d'un seul bloc : une section qui ne tient
     pas dans le reste d'une colonne passe en haut de la suivante (coupée seulement si elle dépasse une colonne
-    entière). Rend False si tout ne tient pas sur la page."""
-    cols, gap = _colonnes(), taille * 0.3  # en plus de la marge basse de .sec, comprise dans la zone remplie
-    c, y = 0, cols[0].y0
+    entière). dev : la 1re page, déjà commencée dans w ; la 2e est commencée au besoin. Rend le nombre de pages
+    utilisées, ou 0 si tout ne tient pas dans `pages` pages."""
+    cols, gap = _colonnes(pages), taille * 0.3  # en plus de la marge basse de .sec, comprise dans la zone remplie
+    c, y, page = 0, cols[0][1].y0, 0
     for html_sec in sections:
         story = pymupdf.Story(html=html_sec, user_css=css, archive=archive)
         while True:
             if c >= len(cols):
-                return False
-            col = cols[c]
+                return 0
+            p, col = cols[c]
+            if p > page:  # première colonne de la page suivante
+                w.end_page()
+                dev, page = w.begin_page(A4), p
             reste, rempli = story.place(pymupdf.Rect(col.x0, y, col.x1, col.y1))
             if reste and y > col.y0:  # pas la place ici : la section repart en haut de la colonne suivante
-                c, y = c + 1, cols[min(c + 1, len(cols) - 1)].y0
+                c += 1
+                y = cols[c][1].y0 if c < len(cols) else 0
                 story = pymupdf.Story(html=html_sec, user_css=css, archive=archive)
                 continue
             story.draw(dev)
             if not reste:
                 y = rempli[3] + gap  # bas de la zone remplie
                 break
-            c, y = c + 1, cols[min(c + 1, len(cols) - 1)].y0  # plus haute qu'une colonne : la suite en face
-    return True
+            c += 1  # plus haute qu'une colonne : la suite en face
+            y = cols[c][1].y0 if c < len(cols) else 0
+    return page + 1
 
 
-def _taille(d, polices, archive, corps, titre):
-    """Plus grande taille de texte (pas de 0,25 pt) à laquelle les sections tiennent sur la page."""
+def _taille(d, polices, archive, corps, titre, une_page=False):
+    """Nombre de pages et plus grande taille de texte (pas de 0,25 pt) : une page si le texte y tient sans
+    descendre sous PETIT, sinon deux (recto-verso), plus lisibles qu'une page en tout petit."""
     sections = [_section(s) for s in d["sections"]]
-    taille = 11.0
-    while taille >= TAILLE_MIN:
-        w = pymupdf.DocumentWriter(io.BytesIO())  # essai dessiné à part, jeté ensuite
-        ok = _poser(sections, taille, _css(polices, corps, titre, taille), archive, w.begin_page(A4))
-        w.end_page()
-        w.close()
-        if ok:
-            return sections, taille
-        taille = round(taille - 0.25, 2)
-    raise SystemExit(f"TROP LONG : même en {TAILLE_MIN} pt le contenu ne tient pas sur une page — raccourcir le JSON")
+    for pages, plancher in ((1, TAILLE_MIN),) if une_page else ((1, PETIT), (2, TAILLE_MIN)):
+        taille = 11.0
+        while taille >= plancher:
+            w = pymupdf.DocumentWriter(io.BytesIO())  # essai dessiné à part, jeté ensuite
+            n = _poser(sections, taille, _css(polices, corps, titre, taille), archive, w, w.begin_page(A4), pages)
+            w.end_page()
+            w.close()
+            if n:
+                return sections, taille, n
+            taille = round(taille - 0.25, 2)
+    raise SystemExit(f"TROP LONG : même en {TAILLE_MIN} pt le contenu ne tient pas sur "
+                     f"{'une page' if une_page else 'deux pages'} — raccourcir le JSON")
 
 
 def _tete_html(d, polices, corps, titre):
@@ -156,16 +173,16 @@ def _vignette(livret):
     return h * r.width / r.height, h
 
 
-def construire(json_path, sortie, livret=None, apercu=None):
+def construire(json_path, sortie, livret=None, apercu=None, une_page=False):
     with open(json_path, encoding="utf-8") as f:
         d = json.load(f)
     polices, archive, corps, titre = _polices()
-    sections, taille = _taille(d, polices, archive, corps, titre)
+    sections, taille, pages = _taille(d, polices, archive, corps, titre, une_page)
     livret = livret if livret and os.path.isfile(livret) else None
     vw, vh = _vignette(livret) if livret else (0, 0)
     x_tete = MARGE + (vw + 14 if livret else 0)
 
-    # texte : en-tête puis sections sur deux colonnes, dessinés dans une seule page
+    # texte : en-tête puis sections sur deux colonnes (sur la 2e page, s'il y en a une, sous le rappel du titre)
     tampon = io.BytesIO()
     w = pymupdf.DocumentWriter(tampon)
     dev = w.begin_page(A4)
@@ -173,7 +190,8 @@ def construire(json_path, sortie, livret=None, apercu=None):
     st = pymupdf.Story(html=tete, user_css=css_tete, archive=archive)
     st.place(pymupdf.Rect(x_tete, MARGE, A4.width - MARGE, MARGE + HAUT_TETE - 8))
     st.draw(dev)
-    _poser(sections, taille, _css(polices, corps, titre, taille), archive, dev)
+
+    _poser(sections, taille, _css(polices, corps, titre, taille), archive, w, dev, pages)
     w.end_page()
     w.close()
 
@@ -185,24 +203,35 @@ def construire(json_path, sortie, livret=None, apercu=None):
         with pymupdf.open(livret) as src:
             page.show_pdf_page(r, src, 0)
         page.draw_rect(r, color=(0.8, 0.8, 0.82), width=0.5)
-    y = MARGE + HAUT_TETE - 4
-    page.draw_line((MARGE, y), (A4.width - MARGE, y), color=(0.25, 0.25, 0.28), width=1.2)
     pied = " · ".join(x for x in (d.get("source") and f"D'après le livret : {d['source']}",
                                   "aide-mémoire : les règles complètes font foi") if x)
-    page.insert_text((MARGE, A4.height - MARGE + 6), pied, fontsize=6.5, color=(0.45, 0.45, 0.5))
+    for n, pg in enumerate(doc):
+        y = MARGE + (HAUT_TETE if n == 0 else HAUT_SUITE) - 4
+        pg.draw_line((MARGE, y), (A4.width - MARGE, y), color=(0.25, 0.25, 0.28), width=1.2 if n == 0 else 0.6)
+        if n:  # rappel du titre en haut de la 2e page (réduit au besoin pour tenir sur sa ligne)
+            pg.insert_htmlbox(pymupdf.Rect(MARGE, MARGE, A4.width - MARGE, y - 3),
+                              f'<p class="t2">{_texte(d["titre"])} <span class="eti2">Aide-mémoire · suite</span></p>',
+                              css=css_tete + f" .t2 {{ font-family: {titre}; font-size: 13pt; font-weight: bold; }}"
+                              f" .eti2 {{ font-family: {corps}; font-size: 7.5pt; color: {GRIS}; font-weight: normal; }}",
+                              archive=archive, scale_low=0)
+        numero = f"{n + 1} / {len(doc)} · " if len(doc) > 1 else ""
+        pg.insert_text((MARGE, A4.height - MARGE + 6), numero + pied, fontsize=6.5, color=(0.45, 0.45, 0.5))
     doc.set_metadata({"title": f"{d['titre']} — aide-mémoire", "creator": "regles-jeu"})
     os.makedirs(os.path.dirname(os.path.abspath(sortie)), exist_ok=True)
     doc.save(sortie, garbage=3, deflate=True)
     if apercu:
-        page.get_pixmap(dpi=80).save(apercu)
+        for n, pg in enumerate(doc):
+            racine, ext = os.path.splitext(apercu)
+            pg.get_pixmap(dpi=80).save(apercu if n == 0 else f"{racine}-{n + 1}{ext}")
     doc.close()
-    print(f"OK : {sortie} (texte en {taille} pt{' — petit : envisager de raccourcir' if taille < 8.5 else ''})")
+    print(f"OK : {sortie} (texte en {taille} pt, {'2 pages : à imprimer en recto-verso' if pages > 1 else '1 page'}"
+          f"{' — petit : envisager de raccourcir' if taille < PETIT else ''})")
 
 
 if __name__ == "__main__":
     a = sys.argv[1:]
     opt = lambda n: a[a.index(n) + 1] if n in a else None
-    pos = [x for i, x in enumerate(a) if not x.startswith("--") and (i == 0 or not a[i - 1].startswith("--"))]
+    pos = [x for i, x in enumerate(a) if not x.startswith("--") and (i == 0 or a[i - 1] not in ("--livret", "--apercu"))]
     if len(pos) != 2:
         raise SystemExit(__doc__)
-    construire(pos[0], pos[1], opt("--livret"), opt("--apercu"))
+    construire(pos[0], pos[1], opt("--livret"), opt("--apercu"), "--une-page" in a)

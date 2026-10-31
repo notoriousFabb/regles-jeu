@@ -25,7 +25,7 @@ After You Betobeto-san, The Final Bosses' Blues et Man Eating House (anglais).
 - [Règles sur une page web](#règles-sur-une-page-web)
 - [Version économe en encre](#version-économe-en-encre)
 - [Version allégée pour Discord](#version-allégée-pour-discord)
-- [Aide-mémoire d'une page](#aide-mémoire-dune-page)
+- [Aide-mémoire](#aide-mémoire)
 - [Contrôles automatiques et relecture](#contrôles-automatiques-et-relecture)
 - [Coût en jetons et modèles](#coût-en-jetons-et-modèles)
 - [Corriger une traduction déjà faite](#corriger-une-traduction-déjà-faite)
@@ -62,8 +62,8 @@ After You Betobeto-san, The Final Bosses' Blues et Man Eating House (anglais).
   blanc, texte foncé, illustrations intactes.
 - **Fait aussi la version anglaise** si on la demande (utile pour un livret japonais) : la même spec contient
   les deux textes, et la livraison produit `<nom>_FR.pdf` et `<nom>_EN.pdf`.
-- **Fait l'aide-mémoire d'une page** d'un jeu, si on le demande : mise en place, tour de jeu, fin de partie et
-  score, pièges, sur une feuille A4 à poser sur la table.
+- **Fait l'aide-mémoire** d'un jeu, si on le demande : mise en place, tour de jeu, fin de partie et score,
+  pièges, sur une feuille A4 à poser sur la table (deux pages en recto-verso pour un jeu riche).
 - **Range tout** : livrets dans un dossier par jeu, outils allégés à part, index des jeux traduits.
 
 Préférences de traduction appliquées :
@@ -291,15 +291,16 @@ script le vérifie page par page après coup. Détails : `references/alleger.md`
 
 ---
 
-## Aide-mémoire d'une page
+## Aide-mémoire
 « Fais l'aide-mémoire de CMYK » : Claude lit le texte du livret (le français s'il existe, sinon l'original) et
-écrit un résumé en français qui tient sur **une page A4** : but du jeu, mise en place, tour de jeu, fin de manche
+écrit un résumé en français qui tient sur **une page A4**, ou deux en recto-verso pour un jeu riche : but du jeu, mise en place, tour de jeu, fin de manche
 et score, fin de partie, et un encadré « À ne pas oublier ». Rien n'y est inventé : chaque ligne vient du livret,
 dont les pages sont citées en bas de la feuille.
 
 `aide_memoire.py` met la page en forme : en-tête avec la couverture du livret en vignette, sections sur deux
-colonnes, chacune d'un seul bloc, texte réduit pas à pas pour tenir sur la page (il prévient s'il devient trop
-petit). Fond blanc, à imprimer. Le contenu est rangé dans `_outils/<Jeu>/aide-memoire.json`, la feuille dans
+colonnes, chacune d'un seul bloc, texte réduit pas à pas pour tenir sur la page. Plutôt que de descendre sous
+8,5 pt, il passe sur deux pages numérotées (la seconde rappelle le titre), avec un texte plus grand ; `--une-page`
+l'en empêche. Fond blanc, à imprimer. Le contenu est rangé dans `_outils/<Jeu>/aide-memoire.json`, la feuille dans
 `<Jeu>/<nom>_aide-memoire.pdf`, à côté des livrets. Détails : `references/aide-memoire.md`.
 
 ---
@@ -391,7 +392,7 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
   - `sheet.py` / `side.py` : planche d'aperçu et images côte à côte original / français ;
   - `relecture.py` : relecture du texte seul ; `encre.py` : version économe en encre d'un livret à fond sombre ;
     `comprimer.py` : version allégée sous 10 Mo pour Discord ;
-    `aide_memoire.py` : aide-mémoire d'une page ;
+    `aide_memoire.py` : aide-mémoire (une page, deux au besoin) ;
   - `page_web.py` : texte d'une page web à traduire, et page française reconstruite ;
   - `livrer.py` : livraison (version anglaise comprise ; `--encre` pour la version économe en encre ; `--pdf`
     pour une traduction faite sans spec) ;
