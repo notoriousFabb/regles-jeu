@@ -39,6 +39,15 @@ IGNORE = getattr(spec, "IGNORE", {})
 AVANT_TEXTE = getattr(spec, "AVANT_TEXTE", None)  # f(page, pno, log) : dessin sous le français (bandeau élargi…)
 INCLINEES = getattr(spec, "INCLINEES", [])  # [(page, texte d'origine, français)] : étiquettes penchées
 CONTOURS = getattr(spec, "CONTOURS", {})  # {page: [(x0, y0, x1, y1)]} : lettres doublées d'un contour en tracés
+# [(page, (x0, y0, x1, y1), "rond" | "rect")] : drapeau de la langue d'origine remplacé par le drapeau français
+# (version française seulement : la version anglaise garde le drapeau d'origine)
+DRAPEAUX = getattr(spec, "DRAPEAUX", []) if getattr(spec, "LANGUE", "fr") == "fr" else []
+if DRAPEAUX:
+    try:
+        import drapeau
+    except ImportError:
+        print("ERREUR : DRAPEAUX demande drapeau.py dans le dossier d'outils (le copier depuis les scripts de la skill)")
+        sys.exit(1)
 ENCRE_GARDER = set(getattr(spec, "ENCRE_GARDER", {0}))  # --fond-clair : pages gardées telles quelles (couverture : son illustration couvre la page et serait prise pour un fond)
 ENCRE = "--fond-clair" in sys.argv  # version économe en encre : fond sombre retiré, couleurs claires foncées
 ARGS = [a for a in sys.argv[1:] if not a.startswith("--")]
@@ -618,7 +627,7 @@ for f in FLOWS + card_flows():
     if not 0 <= f["page"] < len(src):
         fail(f"flux de la page {f['page']} : le livret n'a que {len(src)} pages (numérotées 0 à {len(src) - 1})")
     by_page.setdefault(f["page"], []).append(f)
-for pno in {p for p, en, fr in INCLINEES} | set(CONTOURS):
+for pno in {p for p, en, fr in INCLINEES} | set(CONTOURS) | {d[0] for d in DRAPEAUX}:
     by_page.setdefault(pno, [])
 
 for pno, flows in sorted(by_page.items()):
@@ -714,6 +723,8 @@ for pno, flows in sorted(by_page.items()):
         AVANT_TEXTE(page, pno, log)
     if CLAIR:  # après le crochet : ce qu'il a dessiné est éclairci avec le reste de la page
         encre.eclaircir(doc, page, log)
+    if DRAPEAUX:  # après l'éclaircissement : le drapeau garde ses couleurs
+        drapeau.poser(doc, DRAPEAUX, log, {pno})
     draw_tilted(page, tilted, log)
     found = {fr for l, fr in tilted}
     for p, en, fr in INCLINEES:

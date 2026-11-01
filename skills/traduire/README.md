@@ -60,6 +60,8 @@ After You Betobeto-san, The Final Bosses' Blues et Man Eating House (anglais).
   pleine qualité intact.
 - **Produit une version économe en encre** d'un livret à fond sombre, si on la demande : même mise en page, fond
   blanc, texte foncé, illustrations intactes.
+- **Remplace le drapeau de la langue** (Royaume-Uni, États-Unis, Japon…) par le drapeau français dans le livret
+  traduit.
 - **Fait aussi la version anglaise** si on la demande (utile pour un livret japonais) : la même spec contient
   les deux textes, et la livraison produit `<nom>_FR.pdf` et `<nom>_EN.pdf`.
 - **Fait l'aide-mémoire** d'un jeu, si on le demande : mise en place, tour de jeu, fin de partie et score,

@@ -15,13 +15,16 @@ FLOWS : chaque flux = paragraphes posés de haut en bas sur une page, en gardant
 CARDS / CARD_PAGES / CARD_STYLE (facultatif) : textes imprimés sur les mini-cartes illustrées (voir en bas).
 AVANT_TEXTE (facultatif) : fonction (page, pno, log) appelée après l'effacement du texte d'origine et avant
   le français, pour dessiner dessous : redessiner plus large le rectangle arrondi d'un titre devenu trop long
-  (même couleur, retrouvé avec page.get_drawings()), recouvrir un drapeau par un autre… Appelée seulement pour les
+  (même couleur, retrouvé avec page.get_drawings())… (drapeau de langue : DRAPEAUX). Appelée seulement pour les
   pages qui ont un flux (ou une entrée INCLINEES / CONTOURS) : pour une page sans flux, `CONTOURS = {page: []}`.
 IGNORE (facultatif) : lignes volontairement non traduites, pour que le rapport « texte non traduit » ne les liste pas.
 INCLINEES (facultatif) : étiquettes penchées, [(page, "texte exact de la ligne", "français")] : reposées au même
   angle, même couleur et même police (references/pieges.md).
 CONTOURS (facultatif) : {page: [(x0, y0, x1, y1)]} titres dont les lettres sont doublées d'un contour en tracés :
   ces tracés ne sont plus peints (sinon lettres fantômes autour du français).
+DRAPEAUX (facultatif) : [(page, (x0, y0, x1, y1), "rond" | "rect")] drapeau de la langue d'origine (Royaume-Uni,
+  États-Unis, Japon…) remplacé par le drapeau français, en aplats peints par-dessus ; rectangle = le drapeau, ou son
+  liseré quand un trait fermé l'entoure (retrouvé et redessiné par-dessus). Version française seulement : la version anglaise garde le drapeau d'origine (drapeau.py).
 VERSION ANGLAISE (facultatif) : écrire chaque texte X("français", "english") ; `LANGUE=en python -X utf8 build.py
   sortie_en.pdf` construit l'anglais (PowerShell : $env:LANGUE="en"), livrer.py livre alors aussi <nom>_EN.pdf."""
 
@@ -54,6 +57,7 @@ COLUMNS = {}
 IGNORE = {}  # {page: "b0:1 b7"} lignes à ne pas traduire (titre du jeu, calque caché…)
 INCLINEES = []  # [(page, "Connected!", "Reliées !")] étiquettes penchées
 CONTOURS = {}  # {page: [(x0, y0, x1, y1)]} titres aux lettres doublées d'un contour en tracés
+DRAPEAUX = []  # [(0, (1461, 73, 1516, 128), "rond")] drapeau de la langue d'origine -> drapeau français
 
 FLOWS = []
 

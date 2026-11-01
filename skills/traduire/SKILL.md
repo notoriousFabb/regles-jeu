@@ -50,8 +50,14 @@ un livret à problème est mis de côté et signalé.
    par zone de texte, paragraphes `P` / `C` / `L` / `T`, `maxy` = limite basse ; format dans l'en-tête du modèle.
    Colonnes, étapes sur pastille et coupures « Bleu | 19 » sont gérées seules ; `x1=`, `fix=`, `COLUMNS` pour un
    cas raté. Lire `references/pieges.md` avant. Retouches du spec avec l'outil d'édition (pas `sed`).
+   - **Drapeau de la langue** (toujours le chercher sur la planche) : un drapeau du Royaume-Uni, des États-Unis, du
+     Japon… qui indique la langue du livret (près du titre, du nombre de joueurs, en couverture ou au dos) devient
+     le drapeau français : `DRAPEAUX` (en-tête du modèle ; rectangle et liseré : `references/pieges.md`), puis un
+     zoom pour vérifier. Pas un drapeau qui fait partie du jeu (pays, faction) :
+     dans le doute, demander. Vaut aussi pour un scan recouvert.
 4. **Construire** : `python -X utf8 build.py sortie.pdf`. « ERREUR : » = spec à corriger. Journal : « police
-   réduite », « DÉBORDE », icônes, **« TEXTE NON TRADUIT »** (traduire, ou `IGNORE`), **« À VÉRIFIER »**.
+   réduite », « DÉBORDE », icônes, **« TEXTE NON TRADUIT »** (traduire, ou `IGNORE`), **« À VÉRIFIER »**,
+   « drapeau français posé ».
    - **Livret à fond sombre** : une version économe en encre à imprimer est possible **en plus**, jamais
      d'office — seulement si l'utilisateur la demande : `references/encre.md`.
 5. **Relire** — deux agents lancés **en parallèle** (un message, deux appels Agent). Messages **courts** : les

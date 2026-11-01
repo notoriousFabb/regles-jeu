@@ -105,3 +105,14 @@ La plupart sont déjà gérés par `scripts/build.py` ; ce qui reste à faire da
   disparaît (carrés) ; le laisser dans `IGNORE` ou le romaniser.
 - **Icône rattachée à la mauvaise ligne** (lignes hautes qui se chevauchent) : le moteur la rattache à la ligne
   dont le milieu est le plus proche ; si une icône sort encore décalée d'une ligne, vérifier `blocks.txt`.
+
+## Drapeau de la langue d'origine
+Beaucoup de livrets affichent la langue par un drapeau (Royaume-Uni, États-Unis, moitié des deux, Japon…), souvent
+dans un rond près du titre ou du nombre de joueurs. Dans la version française, il devient le drapeau français :
+`DRAPEAUX = [(page, (x0, y0, x1, y1), "rond")]` (ou `"rect"` pour un drapeau rectangulaire).
+- Relever le rectangle : dessin vectoriel → `page.get_drawings()` sur la zone ; s'il y a un **liseré** (trait
+  fermé autour du drapeau : `color` et `width` renseignés), prendre **son** rectangle : il est retrouvé et
+  redessiné par-dessus le drapeau français (journal : « liseré redessiné »). Sinon le rectangle du drapeau ; image
+  → `page.get_image_info()`. Un zoom à 200-300 dpi sur la zone confirme le résultat.
+- Un bout d'ancien drapeau qui dépasse (liseré peint en aplat, pas en trait) : agrandir le rectangle d'un point.
+- Un drapeau qui fait partie du jeu (pays, faction, carte) n'est pas un drapeau de langue : ne pas le toucher.

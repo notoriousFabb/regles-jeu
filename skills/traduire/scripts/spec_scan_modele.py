@@ -23,6 +23,9 @@ MODE "cote" : PAGES = {page: html} ; chaque page d'origine à gauche, sa traduct
     SIDE_WIDTH (largeur de la colonne française en multiple de la page, défaut 1.0), SIDE_STYLE (style du texte),
     SIDE_MARGIN, SIDE_GAP. Si la traduction est trop longue, elle continue sur une page de plus.
 html : <b>, <i>, <br/>, <p>, <h3>, <ul><li>… ; la typographie française (espaces insécables) est posée par scan.py.
+DRAPEAUX (facultatif) : [(page, (x0, y0, x1, y1), "rond" | "rect")] drapeau de la langue d'origine (Royaume-Uni,
+  États-Unis, Japon…) remplacé par le drapeau français, en aplats peints par-dessus ; rectangle = le drapeau, ou son
+  liseré quand un trait fermé l'entoure (retrouvé et redessiné par-dessus). Mode « recouvrir » seulement. Version française seulement : la version anglaise garde le drapeau d'origine (drapeau.py).
 VERSION ANGLAISE (facultatif) : écrire chaque texte X("français", "english") ; `LANGUE=en python -X utf8 scan.py
   sortie_en.pdf` construit l'anglais (PowerShell : $env:LANGUE="en"), livrer.py livre alors aussi <nom>_EN.pdf."""
 
@@ -46,6 +49,7 @@ CSS = """
 BODY = "Av"
 
 ZONES = []
+DRAPEAUX = []  # [(0, (x0, y0, x1, y1), "rond")] drapeau de la langue d'origine -> drapeau français
 
 
 def Z(page, rect, html, **o):

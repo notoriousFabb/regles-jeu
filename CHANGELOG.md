@@ -3,6 +3,13 @@
 Toutes les évolutions notables du plugin. Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 numérotation [sémantique](https://semver.org/lang/fr/).
 
+## [1.5.0] — 2026-11-01
+### Ajouté
+- Drapeau de la langue remplacé par le drapeau français : réglage `DRAPEAUX` du spec (`[(page, rect, "rond" |
+  "rect")]`), peint par `drapeau.py` (nouveau) dans `build.py` et dans `scan.py` (mode « recouvrir ») ; version
+  française seulement. La méthode demande de chercher ce drapeau sur la planche de chaque livret
+  (`references/pieges.md`, « Drapeau de la langue d'origine »).
+
 ## [1.4.0] — 2026-11-01
 ### Modifié
 - Aide-mémoire sur deux pages quand une seule ne suffit pas : plutôt que de réduire le texte sous 8,5 pt,

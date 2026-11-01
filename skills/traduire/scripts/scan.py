@@ -161,6 +161,10 @@ def recouvrir():
         covers = [c for c in covers if c[3]]
     for pno, r, col, _ in covers:
         doc[pno].draw_rect(r, color=None, fill=col, overlay=True)
+    drapeaux = getattr(spec, "DRAPEAUX", []) if LANGUE == "fr" else []
+    if drapeaux:  # drapeau de la langue d'origine remplacé par le drapeau français (drapeau.py)
+        import drapeau
+        drapeau.poser(doc, drapeaux, log)
     for tag, z, r in texts:
         page = doc[z["page"]]
         # zone d'une seule ligne : interligne 1.0 et marge négative, sinon la police est réduite pour rien
